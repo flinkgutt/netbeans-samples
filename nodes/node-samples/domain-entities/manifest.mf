@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module: net.flinkgutt.samples.nodes.domain.entities
+OpenIDE-Module-Localizing-Bundle: net/flinkgutt/samples/nodes/domain/entities/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
+

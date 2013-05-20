@@ -1,0 +1,97 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package net.flinkgutt.samples.nodes.domain.entities;
+
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
+import java.util.List;
+import net.flinkgutt.samples.nodes.api.ICategory;
+
+/**
+ *
+ * @author Christian
+ */
+public class Category implements ICategory {
+
+    private Integer categoryID, parentID;
+    private String name;
+    private List<ICategory> children = new ArrayList<ICategory>();
+    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    
+    public Category(Integer id, Integer parentId, String categoryName) {
+        categoryID = id;
+        parentID = parentId;
+        name = categoryName;
+    }
+
+    public Category() {
+    }
+
+    @Override
+    public Integer getCategoryID() {
+        return categoryID;
+    }
+
+    @Override
+    public Integer getParentID() {
+        return parentID;
+    }
+
+    public void setCategoryID(Integer id) {
+        categoryID = id;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void setName(String name) {
+        String oldName = this.name;
+        this.name = name;
+        pcs.firePropertyChange("name", oldName, this.name);
+    }
+
+    @Override
+    public List<ICategory> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<ICategory> categories) {
+        children = categories;
+    }
+
+    @Override
+    public void addChild(ICategory child) {
+        children.add(child);
+        pcs.firePropertyChange("children", null, child);
+    }
+
+    @Override
+    public void removeChild(ICategory child) {
+        children.remove(child);
+        for (int i = 0; i < children.size(); i++) {
+            ICategory c = children.get(i);
+            if (c.getCategoryID() == child.getCategoryID()) {
+                List<ICategory> oldChildren = children;
+                children.remove(i);
+                pcs.firePropertyChange("children", oldChildren, children);
+                return;
+            }
+        }
+    }
+
+    @Override
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        pcs.addPropertyChangeListener(listener);
+    }
+
+    @Override
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        pcs.removePropertyChangeListener(listener);
+    }
+}
