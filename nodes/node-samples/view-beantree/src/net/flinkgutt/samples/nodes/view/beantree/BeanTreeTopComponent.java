@@ -71,12 +71,12 @@ public final class BeanTreeTopComponent extends TopComponent implements Explorer
     private void initComponents() {
 
         categoryBeanTreeView = new org.openide.explorer.view.BeanTreeView();
-        jButton1 = new javax.swing.JButton();
+        refreshButton = new javax.swing.JButton();
 
-        org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(BeanTreeTopComponent.class, "BeanTreeTopComponent.jButton1.text")); // NOI18N
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        org.openide.awt.Mnemonics.setLocalizedText(refreshButton, org.openide.util.NbBundle.getMessage(BeanTreeTopComponent.class, "BeanTreeTopComponent.refreshButton.text")); // NOI18N
+        refreshButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                refreshButtonActionPerformed(evt);
             }
         });
 
@@ -87,7 +87,7 @@ public final class BeanTreeTopComponent extends TopComponent implements Explorer
             .addComponent(categoryBeanTreeView, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton1)
+                .addComponent(refreshButton)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -95,18 +95,18 @@ public final class BeanTreeTopComponent extends TopComponent implements Explorer
             .addGroup(layout.createSequentialGroup()
                 .addComponent(categoryBeanTreeView, javax.swing.GroupLayout.DEFAULT_SIZE, 349, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1)
+                .addComponent(refreshButton)
                 .addGap(22, 22, 22))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
         refreshTree();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_refreshButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.openide.explorer.view.BeanTreeView categoryBeanTreeView;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton refreshButton;
     // End of variables declaration//GEN-END:variables
     @Override
     public void componentOpened() {

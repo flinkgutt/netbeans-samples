@@ -13,6 +13,7 @@ import org.openide.NotifyDescriptor;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 import org.openide.util.WeakListeners;
 
 /**
@@ -76,14 +77,14 @@ public class CategoryNode extends AbstractNode implements PropertyChangeListener
     private class CreateCategoryAction extends AbstractAction {
 
         public CreateCategoryAction() {
-            putValue(NAME, "Create category");
+            putValue(NAME, NbBundle.getMessage(CategoryNode.class, "Action.createCategory.label"));
         }
 
         @Override
         public void actionPerformed(ActionEvent ae) {
-            String fieldLabel = "Name: ";
-            String title = "Enter the name for the new Category";
-            NotifyDescriptor.InputLine input = new NotifyDescriptor.InputLine(fieldLabel, title);
+            NotifyDescriptor.InputLine input = new NotifyDescriptor.InputLine(
+                    NbBundle.getMessage(CategoryNode.class, "Action.createCategory.name.label"),
+                    NbBundle.getMessage(CategoryNode.class, "Action.createCategory.title"));
             input.setInputText(""); // specify a default name
             Object result = DialogDisplayer.getDefault().notify(input);
             if (result != NotifyDescriptor.OK_OPTION) {
@@ -94,17 +95,18 @@ public class CategoryNode extends AbstractNode implements PropertyChangeListener
             category.addChild(newCat);
         }
     }
+
     private class RenameCategoryAction extends AbstractAction {
 
         public RenameCategoryAction() {
-            putValue(NAME, "Rename category");
+            putValue(NAME, NbBundle.getMessage(CategoryNode.class, "Action.renameCategory.label"));
         }
 
         @Override
         public void actionPerformed(ActionEvent ae) {
-            String fieldLabel = "Name: ";
-            String title = "Enter the new name for the Category";
-            NotifyDescriptor.InputLine input = new NotifyDescriptor.InputLine(fieldLabel, title);
+            NotifyDescriptor.InputLine input = new NotifyDescriptor.InputLine(
+                    NbBundle.getMessage(CategoryNode.class, "Action.renameCategory.name.label"), 
+                    NbBundle.getMessage(CategoryNode.class, "Action.renameCategory.title"));
             input.setInputText(category.getName()); // specify a default name
             Object result = DialogDisplayer.getDefault().notify(input);
             if (result != NotifyDescriptor.OK_OPTION) {
