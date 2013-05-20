@@ -5,6 +5,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import static javax.swing.Action.NAME;
 import net.flinkgutt.samples.nodes.api.ICategory;
 import net.flinkgutt.samples.nodes.api.ICategoryDAO;
 import org.openide.DialogDisplayer;
@@ -64,7 +65,8 @@ public class CategoryNode extends AbstractNode implements PropertyChangeListener
     public Action[] getActions(boolean popup) {
         if (category != null) {
             return new Action[]{
-                new CreateCategoryAction()
+                new CreateCategoryAction(),
+                new RenameCategoryAction()
             };
         } else {
             return new Action[]{};
@@ -80,7 +82,7 @@ public class CategoryNode extends AbstractNode implements PropertyChangeListener
         @Override
         public void actionPerformed(ActionEvent ae) {
             String fieldLabel = "Name: ";
-            String title = "Enter the name of the new Category";
+            String title = "Enter the name for the new Category";
             NotifyDescriptor.InputLine input = new NotifyDescriptor.InputLine(fieldLabel, title);
             input.setInputText(""); // specify a default name
             Object result = DialogDisplayer.getDefault().notify(input);
@@ -90,6 +92,28 @@ public class CategoryNode extends AbstractNode implements PropertyChangeListener
             String categoryName = input.getInputText();
             ICategory newCat = categoryDAO.createCategory(category.getParentID(), categoryName);
             category.addChild(newCat);
+        }
+    }
+    private class RenameCategoryAction extends AbstractAction {
+
+        public RenameCategoryAction() {
+            putValue(NAME, "Rename category");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            String fieldLabel = "Name: ";
+            String title = "Enter the new name for the Category";
+            NotifyDescriptor.InputLine input = new NotifyDescriptor.InputLine(fieldLabel, title);
+            input.setInputText(category.getName()); // specify a default name
+            Object result = DialogDisplayer.getDefault().notify(input);
+            if (result != NotifyDescriptor.OK_OPTION) {
+                return;
+            }
+            String newName = input.getInputText();
+            String oldName = category.getName();
+            category.setName(newName);
+            fireNameChange(oldName, newName);
         }
     }
 }
