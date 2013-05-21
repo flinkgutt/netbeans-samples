@@ -27,4 +27,10 @@ public interface ICategory {
     
     void addPropertyChangeListener(PropertyChangeListener listener);
     void removePropertyChangeListener(PropertyChangeListener listener);
+
+    String getDescription();
+
+    void setDescription(String description);
+
+    void setChildren(List<ICategory> categories);
 }

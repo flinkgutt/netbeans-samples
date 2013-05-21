@@ -86,13 +86,14 @@ public class CategoryNode extends AbstractNode implements PropertyChangeListener
             NotifyDescriptor.InputLine input = new NotifyDescriptor.InputLine(
                     NbBundle.getMessage(CategoryNode.class, "Action.createCategory.name.label"),
                     NbBundle.getMessage(CategoryNode.class, "Action.createCategory.title"));
-            input.setInputText(""); // specify a default name
             Object result = DialogDisplayer.getDefault().notify(input);
             if (result != NotifyDescriptor.OK_OPTION) {
                 return;
             }
             String categoryName = input.getInputText();
+            // TODO Simplify the API some here
             ICategory newCat = categoryDAO.createCategory(category, categoryName);
+            categoryDAO.addCategory(newCat);
             category.addChild(newCat);
         }
     }
@@ -106,21 +107,21 @@ public class CategoryNode extends AbstractNode implements PropertyChangeListener
         @Override
         public void actionPerformed(ActionEvent ae) {
             NotifyDescriptor.InputLine input = new NotifyDescriptor.InputLine(
-                    NbBundle.getMessage(CategoryNode.class, "Action.renameCategory.name.label"), 
+                    NbBundle.getMessage(CategoryNode.class, "Action.renameCategory.name.label"),
                     NbBundle.getMessage(CategoryNode.class, "Action.renameCategory.title"));
-            input.setInputText(category.getName()); // specify a default name
+            input.setInputText(category.getName()); // Setting the inputfield to the current name
             Object result = DialogDisplayer.getDefault().notify(input);
             if (result != NotifyDescriptor.OK_OPTION) {
                 return;
             }
-            String newName = input.getInputText();
             String oldName = category.getName();
-            category.setName(newName);
-            fireNameChange(oldName, newName);
+            category.setName(input.getInputText());
+            categoryDAO.update(category);
+            fireNameChange(oldName, input.getInputText());
         }
     }
-    
-     private class RemoveCategoryAction extends AbstractAction {
+
+    private class RemoveCategoryAction extends AbstractAction {
 
         public RemoveCategoryAction() {
             putValue(NAME, NbBundle.getMessage(CategoryNode.class, "Action.removeCategory.label"));
@@ -130,16 +131,22 @@ public class CategoryNode extends AbstractNode implements PropertyChangeListener
         public void actionPerformed(ActionEvent ae) {
 
             NotifyDescriptor.Confirmation confirm = new NotifyDescriptor.Confirmation(
-                    NbBundle.getMessage(CategoryNode.class, "Action.removeCategory.areyousure"), 
-                    NbBundle.getMessage(CategoryNode.class, "Action.removeCategory.title"));
-            
+                    NbBundle.getMessage(CategoryNode.class, "Action.removeCategory.areyousure"),
+                    NbBundle.getMessage(CategoryNode.class, "Action.removeCategory.title"),
+                    NotifyDescriptor.YES_NO_OPTION);
+
             Object result = DialogDisplayer.getDefault().notify(confirm);
             if (result != NotifyDescriptor.YES_OPTION) {
                 return;
             }
-            // TODO We should probably check if the category has children before we remove it
-            category.getParent().removeChild(category);
+            
+            if (categoryDAO.hasChildren(category)) {
+                NotifyDescriptor.Message msg = new NotifyDescriptor.Message(NbBundle.getMessage(CategoryNode.class, "Action.removeCategory.notEmpty"),NotifyDescriptor.INFORMATION_MESSAGE);
+                DialogDisplayer.getDefault().notifyLater(msg);
+            } else {
+                category.getParent().removeChild(category);
+                categoryDAO.deleteCategory(category);
+            }
         }
     }
-    
 }

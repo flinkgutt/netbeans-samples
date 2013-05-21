@@ -5,8 +5,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 import net.flinkgutt.samples.nodes.api.ICategory;
+import net.flinkgutt.samples.nodes.api.ICategoryDAO;
 import org.openide.nodes.ChildFactory;
 import org.openide.nodes.Node;
+import org.openide.util.Lookup;
 import org.openide.util.WeakListeners;
 
 /**
@@ -16,7 +18,8 @@ import org.openide.util.WeakListeners;
 class CategoryChildFactory extends ChildFactory<ICategory> implements PropertyChangeListener {
 
     private ICategory currentCategory;
-
+    private ICategoryDAO categoryDAO = Lookup.getDefault().lookup(ICategoryDAO.class);
+    
     public CategoryChildFactory(ICategory category) {
         currentCategory = category;
         currentCategory.addPropertyChangeListener(WeakListeners.propertyChange(this, currentCategory)); // TODO Implement PropertyChangeListener
@@ -29,10 +32,11 @@ class CategoryChildFactory extends ChildFactory<ICategory> implements PropertyCh
 
     @Override
     protected boolean createKeys(List<ICategory> toPopulate) {
-        if (currentCategory == null) {
+        if (currentCategory == null || categoryDAO == null) {
             return true;
         }
-        toPopulate.addAll(currentCategory.getChildren());
+        List<ICategory> categories = categoryDAO.getCategoriesWithParent(currentCategory);
+        toPopulate.addAll(categories);
         return true;
     }
     @Override

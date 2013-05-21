@@ -17,11 +17,11 @@ import net.flinkgutt.samples.nodes.api.ICategory;
 public class Category implements ICategory {
 
     private Integer categoryID;
-    private String name;
+    private String name, description;
     private List<ICategory> children = new ArrayList<ICategory>();
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private ICategory parent;
-    
+
     public Category(Integer id, ICategory parent, String categoryName) {
         categoryID = id;
         name = categoryName;
@@ -38,17 +38,21 @@ public class Category implements ICategory {
 
     @Override
     public Integer getParentID() {
+        if (parent == null) {
+            return 0;
+        }
         return parent.getCategoryID();
     }
 
     public void setParent(ICategory parent) {
         this.parent = parent;
     }
+
     @Override
     public ICategory getParent() {
         return parent;
     }
-    
+
     public void setCategoryID(Integer id) {
         categoryID = id;
     }
@@ -66,10 +70,23 @@ public class Category implements ICategory {
     }
 
     @Override
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
+    public void setDescription(String description) {
+        String oldDescription = this.description;
+        this.description = description;
+        pcs.firePropertyChange("description", oldDescription, this.description);
+    }
+
+    @Override
     public List<ICategory> getChildren() {
         return children;
     }
 
+    @Override
     public void setChildren(List<ICategory> categories) {
         children = categories;
     }
@@ -83,7 +100,7 @@ public class Category implements ICategory {
     @Override
     public void removeChild(ICategory child) {
         children.remove(child);
-        pcs.firePropertyChange("children",child,null);
+        pcs.firePropertyChange("children", child, null);
     }
 
     @Override

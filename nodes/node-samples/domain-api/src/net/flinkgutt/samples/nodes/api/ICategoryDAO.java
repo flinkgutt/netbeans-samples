@@ -10,12 +10,16 @@ import java.util.List;
  */
 
 public interface ICategoryDAO<T extends ICategory> {
-    List<T> getCategoriesWithParent(Integer parentID);
+    List<T> getCategoriesWithParent(T parent);
 
     T getRootCategory();
 
-    void updateSomeCategories();
-
     T createCategory(T parent, String name);
     
+    void deleteCategory(T category);
+    boolean hasChildren(T category);
+    
+    void update(T category);
+
+    boolean addCategory(T category);
 }
