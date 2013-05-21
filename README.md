@@ -15,3 +15,12 @@ The Nodes have the following capabilities added to them
 
 Through WeakListeners registered on the entity classes the UI is kept current.
 
+### SQL Setup
+The configuration is setup to use the following properties
+Hostname: localhost
+DB-Port: 3306 (MySQL) or 5432 (PostgreSQL)
+Database: netbeans-samples
+Username: netbeans-samples
+Password: secretpassword123
+
+This can be changed in net.flinkgutt.samples.nodes.domain.dao.SuperDAO.java ("domain-dao" module) if so desired.

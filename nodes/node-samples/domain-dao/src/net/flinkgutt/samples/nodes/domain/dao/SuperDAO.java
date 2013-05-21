@@ -26,7 +26,7 @@ public abstract class SuperDAO {
 
         MySQL, PostgreSQL
     }
-    public DBServer selected = DBServer.MySQL;
+    public DBServer selected = DBServer.PostgreSQL;
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     public SuperDAO() {
@@ -62,6 +62,7 @@ public abstract class SuperDAO {
                 break;
             case PostgreSQL:
                 // Load postgresql.sql
+                jdbcTemplate.getJdbcOperations().batchUpdate(removeEmptyLines("postgresql.sql"));
                 break;
         }
 
