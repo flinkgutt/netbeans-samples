@@ -22,7 +22,7 @@ class CategoryChildFactory extends ChildFactory<ICategory> implements PropertyCh
     
     public CategoryChildFactory(ICategory category) {
         currentCategory = category;
-        currentCategory.addPropertyChangeListener(WeakListeners.propertyChange(this, currentCategory)); // TODO Implement PropertyChangeListener
+        currentCategory.addPropertyChangeListener(WeakListeners.propertyChange(this, currentCategory)); 
     }
 
     @Override
