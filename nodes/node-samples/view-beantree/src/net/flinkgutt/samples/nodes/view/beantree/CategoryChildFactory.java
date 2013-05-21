@@ -38,10 +38,7 @@ class CategoryChildFactory extends ChildFactory<ICategory> implements PropertyCh
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         // If we add or remove a child category we need to call refresh to update the view
-        System.out.println("evt: " + evt.getPropertyName());
-        System.out.println("Category ("+currentCategory.getName()+") has " + currentCategory.getChildren().size()+ " children.");
         if (evt.getPropertyName().equals("children")) {
-            System.out.println("Children!");
             this.refresh(true);
 
         }
