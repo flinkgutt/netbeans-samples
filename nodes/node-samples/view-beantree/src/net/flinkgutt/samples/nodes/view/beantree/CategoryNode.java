@@ -67,7 +67,8 @@ public class CategoryNode extends AbstractNode implements PropertyChangeListener
         if (category != null) {
             return new Action[]{
                 new CreateCategoryAction(),
-                new RenameCategoryAction()
+                new RenameCategoryAction(),
+                new RemoveCategoryAction()
             };
         } else {
             return new Action[]{};
@@ -91,7 +92,7 @@ public class CategoryNode extends AbstractNode implements PropertyChangeListener
                 return;
             }
             String categoryName = input.getInputText();
-            ICategory newCat = categoryDAO.createCategory(category.getParentID(), categoryName);
+            ICategory newCat = categoryDAO.createCategory(category, categoryName);
             category.addChild(newCat);
         }
     }
@@ -118,4 +119,27 @@ public class CategoryNode extends AbstractNode implements PropertyChangeListener
             fireNameChange(oldName, newName);
         }
     }
+    
+     private class RemoveCategoryAction extends AbstractAction {
+
+        public RemoveCategoryAction() {
+            putValue(NAME, NbBundle.getMessage(CategoryNode.class, "Action.removeCategory.label"));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+
+            NotifyDescriptor.Confirmation confirm = new NotifyDescriptor.Confirmation(
+                    NbBundle.getMessage(CategoryNode.class, "Action.removeCategory.areyousure"), 
+                    NbBundle.getMessage(CategoryNode.class, "Action.removeCategory.title"));
+            
+            Object result = DialogDisplayer.getDefault().notify(confirm);
+            if (result != NotifyDescriptor.YES_OPTION) {
+                return;
+            }
+            // TODO We should probably check if the category has children before we remove it
+            category.getParent().removeChild(category);
+        }
+    }
+    
 }

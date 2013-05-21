@@ -16,15 +16,16 @@ import net.flinkgutt.samples.nodes.api.ICategory;
  */
 public class Category implements ICategory {
 
-    private Integer categoryID, parentID;
+    private Integer categoryID;
     private String name;
     private List<ICategory> children = new ArrayList<ICategory>();
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private ICategory parent;
     
-    public Category(Integer id, Integer parentId, String categoryName) {
+    public Category(Integer id, ICategory parent, String categoryName) {
         categoryID = id;
-        parentID = parentId;
         name = categoryName;
+        this.parent = parent;
     }
 
     public Category() {
@@ -37,9 +38,17 @@ public class Category implements ICategory {
 
     @Override
     public Integer getParentID() {
-        return parentID;
+        return parent.getCategoryID();
     }
 
+    public void setParent(ICategory parent) {
+        this.parent = parent;
+    }
+    @Override
+    public ICategory getParent() {
+        return parent;
+    }
+    
     public void setCategoryID(Integer id) {
         categoryID = id;
     }
@@ -74,15 +83,7 @@ public class Category implements ICategory {
     @Override
     public void removeChild(ICategory child) {
         children.remove(child);
-        for (int i = 0; i < children.size(); i++) {
-            ICategory c = children.get(i);
-            if (c.getCategoryID() == child.getCategoryID()) {
-                List<ICategory> oldChildren = children;
-                children.remove(i);
-                pcs.firePropertyChange("children", oldChildren, children);
-                return;
-            }
-        }
+        pcs.firePropertyChange("children",child,null);
     }
 
     @Override

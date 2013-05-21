@@ -18,6 +18,9 @@ public interface ICategory {
     String getName();
     void setName(String name);
     
+    ICategory getParent();
+    //void setParent(ICategory parent);
+    
     List<ICategory> getChildren();
     void addChild(ICategory child);
     void removeChild(ICategory child);

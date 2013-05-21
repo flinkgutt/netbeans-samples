@@ -19,7 +19,7 @@ class CategoryChildFactory extends ChildFactory<ICategory> implements PropertyCh
 
     public CategoryChildFactory(ICategory category) {
         currentCategory = category;
-        currentCategory.addPropertyChangeListener(WeakListeners.propertyChange(this, category)); // TODO Implement PropertyChangeListener
+        currentCategory.addPropertyChangeListener(WeakListeners.propertyChange(this, currentCategory)); // TODO Implement PropertyChangeListener
     }
 
     @Override
@@ -43,7 +43,7 @@ class CategoryChildFactory extends ChildFactory<ICategory> implements PropertyCh
         if (evt.getPropertyName().equals("children")) {
             System.out.println("Children!");
             this.refresh(true);
-            
+
         }
 
 

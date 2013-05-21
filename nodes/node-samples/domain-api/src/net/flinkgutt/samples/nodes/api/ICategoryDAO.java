@@ -16,6 +16,6 @@ public interface ICategoryDAO<T extends ICategory> {
 
     void updateSomeCategories();
 
-    T createCategory(Integer parent, String name);
+    T createCategory(T parent, String name);
     
 }

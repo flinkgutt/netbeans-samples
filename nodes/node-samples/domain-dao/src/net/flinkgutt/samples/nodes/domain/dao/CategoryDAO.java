@@ -25,17 +25,17 @@ public class CategoryDAO implements ICategoryDAO<Category> {
     }
 
     private void addDummyData() {
-        root = new Category(0, 0, "ROOT");
-        Category c1 = new Category(teller++, 0, "Category #1");
-        Category c2 = new Category(teller++, 0, "Category #2");
-        Category c3 = new Category(teller++, 0, "Category #3");
-        Category c4 = new Category(teller++, 0, "Category #4");
+        root = new Category(0, null, "ROOT");
+        Category c1 = new Category(teller++, root, "Category #1");
+        Category c2 = new Category(teller++, root, "Category #2");
+        Category c3 = new Category(teller++, root, "Category #3");
+        Category c4 = new Category(teller++, root, "Category #4");
 
-        Category c1_1 = new Category(teller++, 1, "Category #1-1");
-        Category c1_2 = new Category(teller++, 1, "Category #1-2");
-        Category c1_3 = new Category(teller++, 1, "Category #1-3");
-        Category c2_1 = new Category(teller++, 2, "Category #2-1");
-        Category c2_2 = new Category(teller++, 2, "Category #2-2");
+        Category c1_1 = new Category(teller++, c1, "Category #1-1");
+        Category c1_2 = new Category(teller++, c1, "Category #1-2");
+        Category c1_3 = new Category(teller++, c1, "Category #1-3");
+        Category c2_1 = new Category(teller++, c2, "Category #2-1");
+        Category c2_2 = new Category(teller++, c2, "Category #2-2");
 
         c1.addChild(c1_1);
         c1.addChild(c1_2);
@@ -61,7 +61,7 @@ public class CategoryDAO implements ICategoryDAO<Category> {
         // TODO remove
     }
     @Override
-    public Category createCategory(Integer parent, String name) {
+    public Category createCategory(Category parent, String name) {
         return new Category(teller++, parent, name);
     }
     @Override
