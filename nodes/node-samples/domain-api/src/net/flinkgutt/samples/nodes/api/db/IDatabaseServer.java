@@ -9,6 +9,7 @@ package net.flinkgutt.samples.nodes.api.db;
  * @author Christian
  */
 public interface IDatabaseServer {
+    String getIdentifier();
     String getDisplayName();
     String getDriverUrl();
     String getDefaultPort();
