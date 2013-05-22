@@ -78,7 +78,7 @@ public class ConnectionManager extends javax.swing.JPanel {
         exitButton = new javax.swing.JButton();
 
         serverJList.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            String[] strings = {  };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
@@ -313,7 +313,7 @@ public class ConnectionManager extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addGroup(layout.createSequentialGroup()
@@ -505,13 +505,12 @@ public class ConnectionManager extends javax.swing.JPanel {
                     se.setUseTunnel(s.getBoolean("usetunnel", false));
                     se.setSSHHostname(s.get("sshhostname", ""));
                     se.setSSHUsername(s.get("sshusername", ""));
-                    se.setSSHPort(s.getInt("sshport", 0));
+                    se.setSSHPort(s.getInt("sshport", 22));
 
                     serverList.add(se);
                 }
             }
         }
-
         return serverList;
     }
 }
