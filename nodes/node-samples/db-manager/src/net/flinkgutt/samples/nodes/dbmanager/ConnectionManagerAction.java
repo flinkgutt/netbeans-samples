@@ -4,8 +4,11 @@
  */
 package net.flinkgutt.samples.nodes.dbmanager;
 
+import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
@@ -24,6 +27,9 @@ public final class ConnectionManagerAction implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         // TODO implement action body
-        System.out.println("WE CALLED AN ACTION!");
+        ConnectionManager manager = new ConnectionManager();
+        DialogDescriptor dialogDescriptor = new DialogDescriptor(manager, "Connection Manager");
+        Dialog dialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
+        dialog.setVisible(true);
     }
 }

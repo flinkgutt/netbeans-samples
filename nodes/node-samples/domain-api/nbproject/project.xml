@@ -17,6 +17,7 @@
             </module-dependencies>
             <public-packages>
                 <package>net.flinkgutt.samples.nodes.api</package>
+                <package>net.flinkgutt.samples.nodes.api.db</package>
             </public-packages>
         </data>
     </configuration>
