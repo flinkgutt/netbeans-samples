@@ -1,20 +1,21 @@
 
 package net.flinkgutt.samples.nodes.view.beantree;
 
-import java.util.List;
 import net.flinkgutt.samples.nodes.api.ICategory;
 import net.flinkgutt.samples.nodes.api.ICategoryDAO;
+import net.flinkgutt.samples.nodes.api.IConnectionEvent;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.ExplorerUtils;
-import org.openide.nodes.AbstractNode;
-import org.openide.nodes.Children;
 import org.openide.nodes.Node;
 import org.openide.util.Lookup;
+import org.openide.util.LookupEvent;
+import org.openide.util.LookupListener;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
+import org.openide.util.Utilities;
 
 /**
  * Top component which displays something.
@@ -37,7 +38,7 @@ import org.openide.util.NbBundle.Messages;
     "CTL_BeanTreeTopComponent=BeanTree Window",
     "HINT_BeanTreeTopComponent=This is a BeanTree window"
 })
-public final class BeanTreeTopComponent extends TopComponent implements ExplorerManager.Provider {
+public final class BeanTreeTopComponent extends TopComponent implements ExplorerManager.Provider, LookupListener {
 
     private ICategoryDAO categoryDAO = Lookup.getDefault().lookup(ICategoryDAO.class);
     private ExplorerManager em = new ExplorerManager();
@@ -49,7 +50,7 @@ public final class BeanTreeTopComponent extends TopComponent implements Explorer
         
         associateLookup(ExplorerUtils.createLookup(em, getActionMap()));
         categoryBeanTreeView.setRootVisible(false);
-        refreshTree();
+        //refreshTree();
     }
     
     private void refreshTree() {
@@ -108,9 +109,12 @@ public final class BeanTreeTopComponent extends TopComponent implements Explorer
     private org.openide.explorer.view.BeanTreeView categoryBeanTreeView;
     private javax.swing.JButton refreshButton;
     // End of variables declaration//GEN-END:variables
+    Lookup.Result<IConnectionEvent> result = null;
     @Override
     public void componentOpened() {
         // TODO add custom code on component opening
+        result = Utilities.actionsGlobalContext().lookupResult(IConnectionEvent.class);
+        result.addLookupListener(this);
     }
 
     @Override
@@ -133,5 +137,10 @@ public final class BeanTreeTopComponent extends TopComponent implements Explorer
     @Override
     public ExplorerManager getExplorerManager() {
         return em;
+    }
+
+    @Override
+    public void resultChanged(LookupEvent ev) {
+        System.out.println("BeanTreeTopComponent->resultChanged! " + ev.getSource());
     }
 }
