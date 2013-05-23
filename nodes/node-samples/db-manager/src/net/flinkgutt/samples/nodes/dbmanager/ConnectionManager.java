@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.DefaultComboBoxModel;
+import net.flinkgutt.samples.nodes.api.db.IConnectionService;
 import net.flinkgutt.samples.nodes.api.db.IDatabaseServer;
 import net.flinkgutt.samples.nodes.api.db.IDatabaseServerSettings;
 import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
 import org.openide.util.NbPreferences;
 
 /**
@@ -16,6 +18,7 @@ import org.openide.util.NbPreferences;
  */
 public class ConnectionManager extends javax.swing.JPanel {
 
+    private IConnectionService service = Lookup.getDefault().lookup(IConnectionService.class);
     private List<IDatabaseServer> databaseServers = new ArrayList<IDatabaseServer>();
 
     /**
@@ -42,10 +45,10 @@ public class ConnectionManager extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
+        serverListScrollPane = new javax.swing.JScrollPane();
         serverJList = new javax.swing.JList<IDatabaseServerSettings>();
-        jLabel1 = new javax.swing.JLabel();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
+        serversLabel = new javax.swing.JLabel();
+        settingsTabbedPane1 = new javax.swing.JTabbedPane();
         dbSettingsPanel = new javax.swing.JPanel();
         databaseServerComboBox = new javax.swing.JComboBox<IDatabaseServer>();
         sqlServerLabel = new javax.swing.JLabel();
@@ -62,7 +65,7 @@ public class ConnectionManager extends javax.swing.JPanel {
         databaseField = new javax.swing.JTextField();
         connectionNameLable = new javax.swing.JLabel();
         connectionNameField = new javax.swing.JTextField();
-        jPanel2 = new javax.swing.JPanel();
+        sshTunnelPanel = new javax.swing.JPanel();
         useSSHTunnelCheckbox = new javax.swing.JCheckBox();
         sshTunnelExplainLabel = new javax.swing.JLabel();
         sshHostIpLabel = new javax.swing.JLabel();
@@ -74,7 +77,7 @@ public class ConnectionManager extends javax.swing.JPanel {
         sshPasswordLabel = new javax.swing.JLabel();
         sshPasswordField = new javax.swing.JPasswordField();
         testConnectionButton = new javax.swing.JButton();
-        okButton = new javax.swing.JButton();
+        connectButton = new javax.swing.JButton();
         exitButton = new javax.swing.JButton();
 
         serverJList.setModel(new javax.swing.AbstractListModel() {
@@ -88,10 +91,10 @@ public class ConnectionManager extends javax.swing.JPanel {
                 serverJListValueChanged(evt);
             }
         });
-        jScrollPane1.setViewportView(serverJList);
+        serverListScrollPane.setViewportView(serverJList);
 
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.jLabel1.text")); // NOI18N
+        serversLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        org.openide.awt.Mnemonics.setLocalizedText(serversLabel, org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.serversLabel.text")); // NOI18N
 
         databaseServerComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         databaseServerComboBox.addActionListener(new java.awt.event.ActionListener() {
@@ -196,7 +199,7 @@ public class ConnectionManager extends javax.swing.JPanel {
                 .addContainerGap(73, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.dbSettingsPanel.TabConstraints.tabTitle"), dbSettingsPanel); // NOI18N
+        settingsTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.dbSettingsPanel.TabConstraints.tabTitle"), dbSettingsPanel); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(useSSHTunnelCheckbox, org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.useSSHTunnelCheckbox.text")); // NOI18N
         useSSHTunnelCheckbox.addActionListener(new java.awt.event.ActionListener() {
@@ -232,65 +235,65 @@ public class ConnectionManager extends javax.swing.JPanel {
         sshPasswordField.setText(org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.sshPasswordField.text")); // NOI18N
         sshPasswordField.setEnabled(false);
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
+        javax.swing.GroupLayout sshTunnelPanelLayout = new javax.swing.GroupLayout(sshTunnelPanel);
+        sshTunnelPanel.setLayout(sshTunnelPanelLayout);
+        sshTunnelPanelLayout.setHorizontalGroup(
+            sshTunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(sshTunnelPanelLayout.createSequentialGroup()
+                .addGroup(sshTunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sshTunnelPanelLayout.createSequentialGroup()
+                        .addGroup(sshTunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, sshTunnelPanelLayout.createSequentialGroup()
                                 .addGap(12, 12, 12)
                                 .addComponent(sshPasswordLabel))
-                            .addGroup(jPanel2Layout.createSequentialGroup()
+                            .addGroup(sshTunnelPanelLayout.createSequentialGroup()
                                 .addContainerGap()
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addGroup(sshTunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addComponent(sshPortLabel)
                                     .addComponent(sshHostIpLabel)
                                     .addComponent(sshUsernameLabel))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(sshTunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(sshHostnameField)
                             .addComponent(sshUsernameField)
                             .addComponent(sshPasswordField, javax.swing.GroupLayout.DEFAULT_SIZE, 292, Short.MAX_VALUE)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
+                            .addGroup(sshTunnelPanelLayout.createSequentialGroup()
                                 .addComponent(sshPortSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, Short.MAX_VALUE))))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
+                    .addGroup(sshTunnelPanelLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(sshTunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(useSSHTunnelCheckbox)
                             .addComponent(sshTunnelExplainLabel))))
                 .addContainerGap())
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        sshTunnelPanelLayout.setVerticalGroup(
+            sshTunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(sshTunnelPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(useSSHTunnelCheckbox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(sshTunnelExplainLabel)
                 .addGap(18, 18, 18)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(sshTunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(sshHostnameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(sshHostIpLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(sshTunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(sshPortLabel)
                     .addComponent(sshPortSpinner, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(sshTunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(sshUsernameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(sshUsernameLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(sshTunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(sshPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(sshPasswordLabel))
                 .addContainerGap(91, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.jPanel2.TabConstraints.tabTitle"), jPanel2); // NOI18N
+        settingsTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.sshTunnelPanel.TabConstraints.tabTitle"), sshTunnelPanel); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(testConnectionButton, org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.testConnectionButton.text")); // NOI18N
         testConnectionButton.addActionListener(new java.awt.event.ActionListener() {
@@ -299,7 +302,12 @@ public class ConnectionManager extends javax.swing.JPanel {
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(okButton, org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.okButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(connectButton, org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.connectButton.text")); // NOI18N
+        connectButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                connectButtonActionPerformed(evt);
+            }
+        });
 
         org.openide.awt.Mnemonics.setLocalizedText(exitButton, org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.exitButton.text")); // NOI18N
         exitButton.addActionListener(new java.awt.event.ActionListener() {
@@ -313,36 +321,36 @@ public class ConnectionManager extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addComponent(serverListScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(settingsTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(78, 78, 78)
                         .addComponent(testConnectionButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(okButton)
+                        .addComponent(connectButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(exitButton))
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(serversLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(87, Short.MAX_VALUE))
         );
 
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {exitButton, okButton, testConnectionButton});
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {connectButton, exitButton, testConnectionButton});
 
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(jLabel1)
+                .addComponent(serversLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTabbedPane1)
-                    .addComponent(jScrollPane1))
+                    .addComponent(settingsTabbedPane1)
+                    .addComponent(serverListScrollPane))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(testConnectionButton)
-                    .addComponent(okButton)
+                    .addComponent(connectButton)
                     .addComponent(exitButton))
                 .addContainerGap())
         );
@@ -376,18 +384,21 @@ public class ConnectionManager extends javax.swing.JPanel {
 
     private void serverJListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_serverJListValueChanged
 
+        if (serverJList.isSelectionEmpty()) {
+            return;
+        }
         IDatabaseServerSettings settings = serverJList.getSelectedValue();
         connectionNameField.setText(settings.getDisplayName());
         databaseField.setText(settings.getDBName());
         hostnameField.setText(settings.getDBHostname());
-        dbPortField.setText(""+settings.getDBPort());
+        dbPortField.setText("" + settings.getDBPort());
         passwordField.setText(settings.getDBPassword());
         usernameField.setText(settings.getDBUsername());
-        
+
         sshHostnameField.setText(settings.getSSHHostname());
         sshPasswordField.setText(settings.getSSHPassword());
         sshPortSpinner.setValue(settings.getSSHPort());
-        
+
         String identifier = settings.getDBIdentifier();
 
         // Setting the correct database server in the combobox
@@ -416,7 +427,17 @@ public class ConnectionManager extends javax.swing.JPanel {
             Exceptions.printStackTrace(ex);
         }
     }//GEN-LAST:event_exitButtonActionPerformed
+    private IDatabaseServerSettings currentSettings = null;
+    private void connectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectButtonActionPerformed
+        // TODO add your handling code here:
+        currentSettings = serverJList.getSelectedValue();
+        if (currentSettings != null) {
+            service.connect(currentSettings);
+        }
+
+    }//GEN-LAST:event_connectButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton connectButton;
     private javax.swing.JTextField connectionNameField;
     private javax.swing.JLabel connectionNameLable;
     private javax.swing.JTextField databaseField;
@@ -428,15 +449,13 @@ public class ConnectionManager extends javax.swing.JPanel {
     private javax.swing.JButton exitButton;
     private javax.swing.JTextField hostnameField;
     private javax.swing.JLabel hostnameLabel;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JButton okButton;
     private javax.swing.JPasswordField passwordField;
     private javax.swing.JLabel passwordLabel;
     private javax.swing.JList<IDatabaseServerSettings> serverJList;
+    private javax.swing.JScrollPane serverListScrollPane;
+    private javax.swing.JLabel serversLabel;
+    private javax.swing.JTabbedPane settingsTabbedPane1;
     private javax.swing.JLabel sqlServerLabel;
     private javax.swing.JLabel sshHostIpLabel;
     private javax.swing.JTextField sshHostnameField;
@@ -445,6 +464,7 @@ public class ConnectionManager extends javax.swing.JPanel {
     private javax.swing.JLabel sshPortLabel;
     private javax.swing.JSpinner sshPortSpinner;
     private javax.swing.JLabel sshTunnelExplainLabel;
+    private javax.swing.JPanel sshTunnelPanel;
     private javax.swing.JTextField sshUsernameField;
     private javax.swing.JLabel sshUsernameLabel;
     private javax.swing.JButton testConnectionButton;
@@ -464,6 +484,8 @@ public class ConnectionManager extends javax.swing.JPanel {
         tacofisk.put("dbname", "netbeans-samples");
         tacofisk.putInt("dbport", 3306);
         tacofisk.put("dbidentifier", "com.mysql");
+        tacofisk.put("jdbcurl", "jdbc:mysql://");
+        tacofisk.put("dbdriver", "org.gjt.mm.mysql.Driver");
         tacofisk.putBoolean("useTunnel", false);
 
         Preferences flinkgutt = servers.node("DBSERVER-flinkgutt");
@@ -473,6 +495,8 @@ public class ConnectionManager extends javax.swing.JPanel {
         flinkgutt.put("dbusername", "netbeans-samples");
         flinkgutt.put("dbpassword", "secretpassword123");
         flinkgutt.put("dbidentifier", "org.postgresql");
+        flinkgutt.put("dbdriver", "org.postgresql.Driver");
+        flinkgutt.put("jdbcurl", "jdbc:postgresql://");
         flinkgutt.putInt("dbport", 5432);
         flinkgutt.putBoolean("useTunnel", false);
 
@@ -488,7 +512,7 @@ public class ConnectionManager extends javax.swing.JPanel {
 
         Preferences servers = NbPreferences.root().node("netbeans-samples_servers");
         if (servers != null) {
-            String[] dbservers = servers.childrenNames();;
+            String[] dbservers = servers.childrenNames();
             for (int i = 0; i < dbservers.length; i++) {
                 String specificServer = dbservers[i];
                 if (specificServer.startsWith("DBSERVER-")) {
@@ -499,9 +523,11 @@ public class ConnectionManager extends javax.swing.JPanel {
                     se.setDBHostname(s.get("dbhostname", ""));
                     se.setDBPort(s.getInt("dbport", 0));
                     se.setDbName(s.get("dbname", ""));
+                    se.setDbUsername(s.get("dbusername", ""));
                     se.setDbPassword(s.get("dbpassword", ""));
                     se.setDBIdentifier(s.get("dbidentifier", ""));
-
+                    se.setDriver(s.get("dbdriver", ""));
+                    se.setJDBCString(s.get("jdbcurl", ""));
                     se.setUseTunnel(s.getBoolean("usetunnel", false));
                     se.setSSHHostname(s.get("sshhostname", ""));
                     se.setSSHUsername(s.get("sshusername", ""));

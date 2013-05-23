@@ -14,6 +14,7 @@ public class DBServerSettings implements IDatabaseServerSettings {
 
     private String displayName, dbHostname, dbUsername, dbPassword, dbName, dbIdentifier;
     private String sshHostname, sshUsername, sshPassword;
+    private String driver, jdbcString;
     private int sshPort, dbPort;
     private boolean useTunnel;
 
@@ -124,6 +125,24 @@ public class DBServerSettings implements IDatabaseServerSettings {
 
     public void setDBIdentifier(String dbIdentifier) {
         this.dbIdentifier = dbIdentifier;
+    }
+
+    @Override
+    public String getDriver() {
+        return driver;
+    }
+
+    public void setDriver(String driver) {
+        this.driver = driver;
+    }
+
+    @Override
+    public String getJDBCString() {
+        return jdbcString;
+    }
+
+    public void setJDBCString(String jdbcString) {
+        this.jdbcString = jdbcString;
     }
     
 }

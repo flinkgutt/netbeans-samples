@@ -5,19 +5,16 @@ import java.beans.PropertyChangeSupport;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.flinkgutt.samples.nodes.api.IConnectionEvent;
+import net.flinkgutt.samples.nodes.api.db.IConnectionService;
+import net.flinkgutt.samples.nodes.api.db.IDatabaseServerSettings;
 import org.openide.util.Lookup;
-import org.openide.util.LookupEvent;
-import org.openide.util.LookupListener;
-import org.openide.util.Utilities;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -27,9 +24,9 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
  *
  * @author Christian
  */
-public abstract class SuperDAO implements LookupListener, Lookup.Provider {
+public abstract class SuperDAO implements Lookup.Provider, IConnectionService {
 
-    public NamedParameterJdbcTemplate jdbcTemplate;
+    NamedParameterJdbcTemplate jdbcTemplate;
     private DriverManagerDataSource dataSource;
 
     public enum DBServer {
@@ -39,25 +36,21 @@ public abstract class SuperDAO implements LookupListener, Lookup.Provider {
     public DBServer selected = DBServer.MySQL;
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     Lookup.Result<IConnectionEvent> result = null;
+    Lookup.Result<IDatabaseServerSettings> settingsResult = null;
 
     public SuperDAO() {
-        result = Utilities.actionsGlobalContext().lookupResult(IConnectionEvent.class);
-        result.addLookupListener(this);
+        //result = Utilities.actionsGlobalContext().lookupResult(IConnectionEvent.class);
+        //result.addLookupListener(this);
     }
 
-    private void connect() {
+    @Override
+    public void connect(IDatabaseServerSettings settings) {
         dataSource = new DriverManagerDataSource();
-        if (selected == DBServer.PostgreSQL) {
-            dataSource.setDriverClassName("org.postgresql.Driver");
-            dataSource.setUrl("jdbc:postgresql://localhost:5432/netbeans-samples");
-            dataSource.setUsername("netbeans-samples");
-            dataSource.setPassword("secretpassword123");
-        } else if (selected == DBServer.MySQL) {
-            dataSource.setDriverClassName("org.gjt.mm.mysql.Driver");
-            dataSource.setUrl("jdbc:mysql://localhost:3306/netbeans-samples");
-            dataSource.setUsername("netbeans-samples");
-            dataSource.setPassword("secretpassword123");
-        }
+        dataSource.setDriverClassName(settings.getDriver());
+        dataSource.setUrl(settings.getJDBCString() + settings.getDBHostname() + ":" + settings.getDBPort() + "/" + settings.getDBName());
+        dataSource.setUsername(settings.getDBUsername());
+        dataSource.setPassword(settings.getDBPassword());
+        
         jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
         try {
             checkForSampleDB();
@@ -84,23 +77,24 @@ public abstract class SuperDAO implements LookupListener, Lookup.Provider {
 
     }
 
-    @Override
-    public void resultChanged(LookupEvent ev) {
-        System.out.println("LookupEvent: " + ev.getSource());
-        Lookup.Result r = (Lookup.Result) ev.getSource();
-        Collection<IConnectionEvent> events = r.allInstances();
-        System.out.println("events.size() => " + events.size());
-        if (events.size() == 1) {
-            IConnectionEvent event = events.iterator().next();
-            if (event.getEvent() == IConnectionEvent.CONNECT) {
-                connect();
-            } else if (event.getEvent() == IConnectionEvent.DISCONNECT) {
-                //disconnect(); // TODO Implement a disconnect, or not.
-            }
-        }
-        // if correct event, call connect()
-    }
-
+    /**
+     * @Override public void resultChanged(LookupEvent ev) {
+     *
+     * System.out.println("LookupEvent: " + ev.getSource()); Lookup.Result r =
+     * (Lookup.Result) ev.getSource();
+     *
+     * Collection instances = r.allInstances(); for (Iterator it =
+     * instances.iterator(); it.hasNext();) { Object object = it.next();
+     * System.out.println("\tInstance of " + object.getClass()); }
+     *
+     * Collection<IConnectionEvent> events = r.allInstances();
+     * System.out.println("events.size() => " + events.size()); if
+     * (events.size() == 1) { IConnectionEvent event = events.iterator().next();
+     * if (event.getEvent() == IConnectionEvent.CONNECT) { //connect(); } else
+     * if (event.getEvent() == IConnectionEvent.DISCONNECT) { //disconnect(); //
+     * TODO Implement a disconnect, or not. } } // if correct event, call
+     * connect() }
+     */
     private String[] removeEmptyLines(String file) throws FileNotFoundException {
         String text = "";
         InputStream is = getClass().getResourceAsStream(file);

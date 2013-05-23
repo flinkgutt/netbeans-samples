@@ -10,6 +10,8 @@ package net.flinkgutt.samples.nodes.api.db;
  */
 public interface IDatabaseServerSettings {
     String getDisplayName();
+    String getDriver();
+    String getJDBCString();
     String getDBHostname();
     String getDBUsername();
     String getDBPassword();
