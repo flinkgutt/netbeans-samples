@@ -4,20 +4,19 @@ import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.swing.DefaultEventListModel;
 import ca.odell.glazedlists.swing.GlazedListsSwing;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-import javax.swing.AbstractListModel;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListModel;
-import javax.swing.ListModel;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 import net.flinkgutt.samples.nodes.api.db.IConnectionService;
 import net.flinkgutt.samples.nodes.api.db.IDatabaseServer;
 import net.flinkgutt.samples.nodes.api.db.IDatabaseServerSettings;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbPreferences;
@@ -98,6 +97,7 @@ public class ConnectionManager extends javax.swing.JPanel {
         exitButton = new javax.swing.JButton();
         addServerButton = new javax.swing.JButton();
         saveServerSettingButton = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         serverJList.setModel(settingsModel);
         serverJList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -325,13 +325,16 @@ public class ConnectionManager extends javax.swing.JPanel {
 
         settingsTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.sshTunnelPanel.TabConstraints.tabTitle"), sshTunnelPanel); // NOI18N
 
+        connectButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/net/flinkgutt/samples/nodes/dbmanager/1369435792_connect_creating.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(connectButton, org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.connectButton.text")); // NOI18N
+        connectButton.setToolTipText(org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.connectButton.toolTipText")); // NOI18N
         connectButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 connectButtonActionPerformed(evt);
             }
         });
 
+        exitButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/net/flinkgutt/samples/nodes/dbmanager/1369435876_exit.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(exitButton, org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.exitButton.text")); // NOI18N
         exitButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -339,26 +342,34 @@ public class ConnectionManager extends javax.swing.JPanel {
             }
         });
 
+        addServerButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/net/flinkgutt/samples/nodes/dbmanager/1369435394_db_add.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(addServerButton, org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.addServerButton.text")); // NOI18N
+        addServerButton.setToolTipText(org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.addServerButton.toolTipText")); // NOI18N
         addServerButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addServerButtonActionPerformed(evt);
             }
         });
 
+        saveServerSettingButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/net/flinkgutt/samples/nodes/dbmanager/1369435663_3floppy_unmount.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(saveServerSettingButton, org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.saveServerSettingButton.text")); // NOI18N
+        saveServerSettingButton.setToolTipText(org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.saveServerSettingButton.toolTipText")); // NOI18N
         saveServerSettingButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 saveServerSettingButtonActionPerformed(evt);
             }
         });
 
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/net/flinkgutt/samples/nodes/dbmanager/1369435531_db_remove.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.jButton1.text")); // NOI18N
+        jButton1.setToolTipText(org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.jButton1.toolTipText")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(serverListScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
+                .addComponent(serverListScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(settingsTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addGroup(layout.createSequentialGroup()
@@ -368,8 +379,10 @@ public class ConnectionManager extends javax.swing.JPanel {
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(addServerButton)
-                        .addGap(33, 33, 33)
+                        .addComponent(addServerButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(66, 66, 66)
                         .addComponent(saveServerSettingButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(connectButton)
@@ -390,10 +403,14 @@ public class ConnectionManager extends javax.swing.JPanel {
                     .addComponent(serverListScrollPane))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(connectButton)
-                    .addComponent(exitButton)
-                    .addComponent(addServerButton)
-                    .addComponent(saveServerSettingButton))
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(exitButton, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(connectButton)
+                            .addComponent(addServerButton)
+                            .addComponent(saveServerSettingButton))))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -420,6 +437,51 @@ public class ConnectionManager extends javax.swing.JPanel {
             // TODO Implement setup of tunnel
             // some check to see if the tunnel is up and running
             // set clearToConnectToDB = false if the tunnel isn't open
+        }
+
+        IDatabaseServer testServer = (IDatabaseServer) databaseServerComboBox.getSelectedItem();
+
+        /*DriverManagerDataSource dataSource = new DriverManagerDataSource();
+         dataSource.setDriverClassName(testServer.getDriverUrl());
+         dataSource.setUrl(testServer.getConnectionString() + hostnameField.getText() + ":" + dbPortField.getText() + "/" + databaseField.getText() );
+         dataSource.setUsername(usernameField.getText());
+         dataSource.setPassword( new String( passwordField.getPassword() ) );
+         NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);*/
+        String dbUrl = testServer.getConnectionString() + hostnameField.getText() + ":" + dbPortField.getText() + "/" + databaseField.getText();
+        String username = usernameField.getText();
+        String password = new String(passwordField.getPassword());
+
+        Connection connection = null;
+        boolean success = true;
+        try {
+            Class.forName(testServer.getDriverUrl());
+            connection = DriverManager.getConnection(dbUrl,
+                    username, password);
+            connection.setAutoCommit(false);
+        } catch (SQLException ex) {
+            /*
+             ** "Connect error"...
+             */
+            success = false;
+        } catch (java.lang.ClassNotFoundException ex) {
+            /*
+             ** "Driver error"...
+             */
+            success = false;
+        } 
+
+        if (success) {
+            NotifyDescriptor nd = new NotifyDescriptor.Message("Connection successfull!", NotifyDescriptor.INFORMATION_MESSAGE);
+            DialogDisplayer.getDefault().notifyLater(nd);
+            try {
+                connection.close();
+            } catch (SQLException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        } else {
+            // TODO Be somewhat more helpfull in the error message
+            NotifyDescriptor nd = new NotifyDescriptor.Message("Not able to connect!", NotifyDescriptor.INFORMATION_MESSAGE);
+            DialogDisplayer.getDefault().notifyLater(nd);
         }
     }//GEN-LAST:event_testConnectionButtonActionPerformed
     private int getIndexOfServer(IDatabaseServerSettings server) {
@@ -564,6 +626,7 @@ public class ConnectionManager extends javax.swing.JPanel {
     private javax.swing.JButton exitButton;
     private javax.swing.JTextField hostnameField;
     private javax.swing.JLabel hostnameLabel;
+    private javax.swing.JButton jButton1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JPasswordField passwordField;
     private javax.swing.JLabel passwordLabel;
@@ -594,7 +657,7 @@ public class ConnectionManager extends javax.swing.JPanel {
         Preferences servers = NbPreferences.root().node("netbeans-samples_servers");
 
         String storedId = s.getStoredID();
-        
+
         Preferences settings = servers.node(storedId);
         settings.put("displayname", s.getDisplayName());
         settings.put("dbhostname", s.getDBHostname());

@@ -15,6 +15,14 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
+                    <code-name-base>com.mysql</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>1.0</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>net.flinkgutt.samples.nodes.api</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -72,7 +80,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.springframework</code-name-base>
+                    <code-name-base>org.postgresql</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>

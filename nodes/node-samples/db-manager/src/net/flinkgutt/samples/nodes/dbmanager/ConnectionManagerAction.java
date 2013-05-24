@@ -26,10 +26,9 @@ public final class ConnectionManagerAction implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        // TODO implement action body
         ConnectionManager manager = new ConnectionManager();
         DialogDescriptor dialogDescriptor = new DialogDescriptor(manager, "Connection Manager");
-        DialogDisplayer.getDefault().notify(dialogDescriptor);
-        manager = null;
+        DialogDisplayer.getDefault().notifyLater(dialogDescriptor);
+        
     }
 }
