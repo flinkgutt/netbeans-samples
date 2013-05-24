@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module: com.glazedlists
+OpenIDE-Module-Localizing-Bundle: com/glazedlists/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
+

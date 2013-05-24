@@ -17,6 +17,7 @@ public class DBServerSettings implements IDatabaseServerSettings {
     private String driver, jdbcString;
     private int sshPort, dbPort;
     private boolean useTunnel;
+    private String storageID; // The identifier used for this server settings in whatever storage mechanism is used
 
     @Override
     public boolean useTunnel() {
@@ -144,5 +145,19 @@ public class DBServerSettings implements IDatabaseServerSettings {
     public void setJDBCString(String jdbcString) {
         this.jdbcString = jdbcString;
     }
+
+    void setSSHPassword(String password) {
+        this.sshPassword = password;
+    }
+
+    @Override
+    public String getStoredID() {
+        return storageID;
+    }
+    
+    public void setStorageID(String storageIdentifier) {
+        storageID = storageIdentifier;
+    }
+    
     
 }

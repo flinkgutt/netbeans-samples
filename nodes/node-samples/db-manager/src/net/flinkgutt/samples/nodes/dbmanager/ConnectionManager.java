@@ -1,10 +1,20 @@
 package net.flinkgutt.samples.nodes.dbmanager;
 
+import ca.odell.glazedlists.BasicEventList;
+import ca.odell.glazedlists.EventList;
+import ca.odell.glazedlists.swing.DefaultEventListModel;
+import ca.odell.glazedlists.swing.GlazedListsSwing;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import javax.swing.AbstractListModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
+import javax.swing.ListModel;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import net.flinkgutt.samples.nodes.api.db.IConnectionService;
 import net.flinkgutt.samples.nodes.api.db.IDatabaseServer;
 import net.flinkgutt.samples.nodes.api.db.IDatabaseServerSettings;
@@ -20,6 +30,8 @@ public class ConnectionManager extends javax.swing.JPanel {
 
     private IConnectionService service = Lookup.getDefault().lookup(IConnectionService.class);
     private List<IDatabaseServer> databaseServers = new ArrayList<IDatabaseServer>();
+    private EventList<IDatabaseServerSettings> settingsEventList = new BasicEventList<IDatabaseServerSettings>();
+    private DefaultEventListModel<IDatabaseServerSettings> settingsModel = GlazedListsSwing.eventListModel(settingsEventList);
 
     /**
      * Creates new form ConnectionManager
@@ -33,7 +45,12 @@ public class ConnectionManager extends javax.swing.JPanel {
         databaseServers.add(mysql);
         databaseServers.add(postgresql);
         databaseServerComboBox.setModel(new DefaultComboBoxModel<IDatabaseServer>(databaseServers.toArray(new IDatabaseServer[databaseServers.size()])));
-
+        try {
+            getConfiguredServers();
+        } catch (BackingStoreException ex) {
+            Exceptions.printStackTrace(ex);
+            // TODO Show some dialog to the user that tells them the PreferenceStore is unavailable, in different and prettier words
+        }
     }
 
     /**
@@ -65,6 +82,7 @@ public class ConnectionManager extends javax.swing.JPanel {
         databaseField = new javax.swing.JTextField();
         connectionNameLable = new javax.swing.JLabel();
         connectionNameField = new javax.swing.JTextField();
+        testConnectionButton = new javax.swing.JButton();
         sshTunnelPanel = new javax.swing.JPanel();
         useSSHTunnelCheckbox = new javax.swing.JCheckBox();
         sshTunnelExplainLabel = new javax.swing.JLabel();
@@ -76,15 +94,12 @@ public class ConnectionManager extends javax.swing.JPanel {
         sshUsernameField = new javax.swing.JTextField();
         sshPasswordLabel = new javax.swing.JLabel();
         sshPasswordField = new javax.swing.JPasswordField();
-        testConnectionButton = new javax.swing.JButton();
         connectButton = new javax.swing.JButton();
         exitButton = new javax.swing.JButton();
+        addServerButton = new javax.swing.JButton();
+        saveServerSettingButton = new javax.swing.JButton();
 
-        serverJList.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = {  };
-            public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
-        });
+        serverJList.setModel(settingsModel);
         serverJList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         serverJList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -96,7 +111,6 @@ public class ConnectionManager extends javax.swing.JPanel {
         serversLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         org.openide.awt.Mnemonics.setLocalizedText(serversLabel, org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.serversLabel.text")); // NOI18N
 
-        databaseServerComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         databaseServerComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 databaseServerComboBoxActionPerformed(evt);
@@ -129,40 +143,54 @@ public class ConnectionManager extends javax.swing.JPanel {
 
         connectionNameField.setText(org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.connectionNameField.text")); // NOI18N
 
+        org.openide.awt.Mnemonics.setLocalizedText(testConnectionButton, org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.testConnectionButton.text")); // NOI18N
+        testConnectionButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                testConnectionButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout dbSettingsPanelLayout = new javax.swing.GroupLayout(dbSettingsPanel);
         dbSettingsPanel.setLayout(dbSettingsPanelLayout);
         dbSettingsPanelLayout.setHorizontalGroup(
             dbSettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(dbSettingsPanelLayout.createSequentialGroup()
-                .addGap(37, 37, 37)
-                .addComponent(connectionNameLable)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(connectionNameField, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(57, Short.MAX_VALUE))
-            .addGroup(dbSettingsPanelLayout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(dbSettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(dbSettingsPanelLayout.createSequentialGroup()
-                        .addGroup(dbSettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(databaseLabel)
-                            .addComponent(hostnameLabel)
-                            .addComponent(sqlServerLabel)
-                            .addComponent(usernameLabel)
-                            .addComponent(passwordLabel))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(dbSettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(databaseServerComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap()
+                        .addGroup(dbSettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(dbSettingsPanelLayout.createSequentialGroup()
-                                .addComponent(hostnameField, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(dbSettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(databaseLabel)
+                                    .addComponent(hostnameLabel)
+                                    .addComponent(sqlServerLabel)
+                                    .addComponent(usernameLabel)
+                                    .addComponent(passwordLabel))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(dbPortLabel)
+                                .addGroup(dbSettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(databaseServerComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addGroup(dbSettingsPanelLayout.createSequentialGroup()
+                                        .addComponent(hostnameField, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(dbPortLabel)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(dbPortField, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(databaseField)
+                                    .addComponent(usernameField)
+                                    .addComponent(passwordField))
+                                .addGap(0, 47, Short.MAX_VALUE))
+                            .addComponent(jSeparator1)))
+                    .addGroup(dbSettingsPanelLayout.createSequentialGroup()
+                        .addGroup(dbSettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(dbSettingsPanelLayout.createSequentialGroup()
+                                .addGap(37, 37, 37)
+                                .addComponent(connectionNameLable)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(dbPortField, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(databaseField)
-                            .addComponent(usernameField)
-                            .addComponent(passwordField))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jSeparator1))
+                                .addComponent(connectionNameField, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(dbSettingsPanelLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(testConnectionButton)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         dbSettingsPanelLayout.setVerticalGroup(
@@ -196,7 +224,9 @@ public class ConnectionManager extends javax.swing.JPanel {
                 .addGroup(dbSettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(passwordLabel))
-                .addContainerGap(73, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
+                .addComponent(testConnectionButton)
+                .addContainerGap())
         );
 
         settingsTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.dbSettingsPanel.TabConstraints.tabTitle"), dbSettingsPanel); // NOI18N
@@ -295,13 +325,6 @@ public class ConnectionManager extends javax.swing.JPanel {
 
         settingsTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.sshTunnelPanel.TabConstraints.tabTitle"), sshTunnelPanel); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(testConnectionButton, org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.testConnectionButton.text")); // NOI18N
-        testConnectionButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                testConnectionButtonActionPerformed(evt);
-            }
-        });
-
         org.openide.awt.Mnemonics.setLocalizedText(connectButton, org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.connectButton.text")); // NOI18N
         connectButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -316,28 +339,46 @@ public class ConnectionManager extends javax.swing.JPanel {
             }
         });
 
+        org.openide.awt.Mnemonics.setLocalizedText(addServerButton, org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.addServerButton.text")); // NOI18N
+        addServerButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addServerButtonActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(saveServerSettingButton, org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.saveServerSettingButton.text")); // NOI18N
+        saveServerSettingButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveServerSettingButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(serverListScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addComponent(serverListScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(settingsTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(78, 78, 78)
-                        .addComponent(testConnectionButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(serversLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(addServerButton)
+                        .addGap(33, 33, 33)
+                        .addComponent(saveServerSettingButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(connectButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(exitButton))
-                    .addComponent(serversLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(87, Short.MAX_VALUE))
+                        .addComponent(exitButton)))
+                .addContainerGap())
         );
 
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {connectButton, exitButton, testConnectionButton});
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {connectButton, exitButton});
 
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -349,9 +390,10 @@ public class ConnectionManager extends javax.swing.JPanel {
                     .addComponent(serverListScrollPane))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(testConnectionButton)
                     .addComponent(connectButton)
-                    .addComponent(exitButton))
+                    .addComponent(exitButton)
+                    .addComponent(addServerButton)
+                    .addComponent(saveServerSettingButton))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -379,28 +421,64 @@ public class ConnectionManager extends javax.swing.JPanel {
             // some check to see if the tunnel is up and running
             // set clearToConnectToDB = false if the tunnel isn't open
         }
-        storeServers(); // TODO REMOVE. Just to test stuff for now.
     }//GEN-LAST:event_testConnectionButtonActionPerformed
-
+    private int getIndexOfServer(IDatabaseServerSettings server) {
+        if (server == null) {
+            return -1;
+        }
+        for (int i = 0; i < settingsEventList.size(); i++) {
+            IDatabaseServerSettings serv = settingsEventList.get(i);
+            if (server.getStoredID().equals(serv.getStoredID())) {
+                return i;
+            }
+        }
+        return -1;
+    }
     private void serverJListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_serverJListValueChanged
 
         if (serverJList.isSelectionEmpty()) {
             return;
         }
-        IDatabaseServerSettings settings = serverJList.getSelectedValue();
-        connectionNameField.setText(settings.getDisplayName());
-        databaseField.setText(settings.getDBName());
-        hostnameField.setText(settings.getDBHostname());
-        dbPortField.setText("" + settings.getDBPort());
-        passwordField.setText(settings.getDBPassword());
-        usernameField.setText(settings.getDBUsername());
+        // Temporarily storing the settings filled out in the view in the associated object
+        int index = getIndexOfServer(currentSettings);
+        if (currentSettings != null && index >= 0) {
+            System.out.println("CurrentSettings: " + currentSettings.getDisplayName() + " with index " + index);
 
-        sshHostnameField.setText(settings.getSSHHostname());
-        sshPasswordField.setText(settings.getSSHPassword());
-        sshPortSpinner.setValue(settings.getSSHPort());
+            ((DBServerSettings) currentSettings).setDisplayName(connectionNameField.getText());
+            ((DBServerSettings) currentSettings).setDbName(databaseField.getText());
+            ((DBServerSettings) currentSettings).setDBHostname(hostnameField.getText());
+            ((DBServerSettings) currentSettings).setDBPort(Integer.parseInt(dbPortField.getText()));
+            ((DBServerSettings) currentSettings).setDbPassword(new String(passwordField.getPassword()));
+            ((DBServerSettings) currentSettings).setDbUsername(usernameField.getText());
 
-        String identifier = settings.getDBIdentifier();
+            ((DBServerSettings) currentSettings).setSSHHostname(sshHostnameField.getText());
+            ((DBServerSettings) currentSettings).setSSHPassword(new String(sshPasswordField.getPassword()));
+            ((DBServerSettings) currentSettings).setSSHPort((Integer) sshPortSpinner.getValue());
+            ((DBServerSettings) currentSettings).setSSHUsername(sshUsernameField.getText());
+            ((DBServerSettings) currentSettings).setUseTunnel(useSSHTunnelCheckbox.isSelected());
+            this.settingsEventList.set(index, currentSettings);
+        }
+        System.out.println("We are passed storing the 'currentSettings'");
 
+        currentSettings = serverJList.getSelectedValue();
+        connectionNameField.setText(currentSettings.getDisplayName());
+        databaseField.setText(currentSettings.getDBName());
+        hostnameField.setText(currentSettings.getDBHostname());
+        dbPortField.setText("" + currentSettings.getDBPort());
+        passwordField.setText(currentSettings.getDBPassword());
+        usernameField.setText(currentSettings.getDBUsername());
+
+        sshHostnameField.setText(currentSettings.getSSHHostname());
+        sshPasswordField.setText(currentSettings.getSSHPassword());
+        sshPortSpinner.setValue(currentSettings.getSSHPort());
+        sshUsernameField.setText(currentSettings.getSSHUsername());
+        useSSHTunnelCheckbox.setSelected(currentSettings.useTunnel());
+
+        String identifier = currentSettings.getDBIdentifier();
+        if (identifier == null) {
+            databaseServerComboBox.setSelectedIndex(0);
+            return;
+        }
         // Setting the correct database server in the combobox
         int itemCount = databaseServerComboBox.getItemCount();
         for (int i = 0; i < itemCount; i++) {
@@ -417,26 +495,63 @@ public class ConnectionManager extends javax.swing.JPanel {
         dbPortField.setText(databaseServer.getDefaultPort());
 
     }//GEN-LAST:event_databaseServerComboBoxActionPerformed
-
-    private void exitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitButtonActionPerformed
-        try {
-            // TODO add your handling code here:
-            List<IDatabaseServerSettings> servers = getConfiguredServers();
-            this.serverJList.setListData(servers.toArray(new IDatabaseServerSettings[servers.size()]));
-        } catch (BackingStoreException ex) {
-            Exceptions.printStackTrace(ex);
-        }
-    }//GEN-LAST:event_exitButtonActionPerformed
     private IDatabaseServerSettings currentSettings = null;
     private void connectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectButtonActionPerformed
         // TODO add your handling code here:
+        saveServerSettingButtonActionPerformed(null);
         currentSettings = serverJList.getSelectedValue();
         if (currentSettings != null) {
             service.connect(currentSettings);
         }
 
     }//GEN-LAST:event_connectButtonActionPerformed
+
+    private void exitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitButtonActionPerformed
+        try {
+            // TODO add your handling code here:
+            getConfiguredServers();
+            //this.serverJList.setListData(servers.toArray(new IDatabaseServerSettings[servers.size()]));
+        } catch (BackingStoreException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }//GEN-LAST:event_exitButtonActionPerformed
+    private int newServerCounter = 1;
+    private void addServerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addServerButtonActionPerformed
+        // Adds an empty server settings object to the ServerJList
+        DBServerSettings newServer = new DBServerSettings();
+        newServer.setDisplayName("New Server #" + newServerCounter++);
+        newServer.setStorageID("DBSERVER-" + System.currentTimeMillis());
+        settingsEventList.add(newServer);
+    }//GEN-LAST:event_addServerButtonActionPerformed
+
+    private void saveServerSettingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveServerSettingButtonActionPerformed
+        // Saves the currently selected servers settings
+        if (currentSettings == null) {
+            return;
+        }
+        ((DBServerSettings) currentSettings).setDisplayName(connectionNameField.getText());
+        ((DBServerSettings) currentSettings).setDbName(databaseField.getText());
+        ((DBServerSettings) currentSettings).setDBHostname(hostnameField.getText());
+        ((DBServerSettings) currentSettings).setDBPort(Integer.parseInt(dbPortField.getText()));
+        ((DBServerSettings) currentSettings).setDbPassword(new String(passwordField.getPassword()));
+        ((DBServerSettings) currentSettings).setDbUsername(usernameField.getText());
+
+        ((DBServerSettings) currentSettings).setSSHHostname(sshHostnameField.getText());
+        ((DBServerSettings) currentSettings).setSSHPassword(new String(sshPasswordField.getPassword()));
+        ((DBServerSettings) currentSettings).setSSHUsername(sshUsernameField.getText());
+        ((DBServerSettings) currentSettings).setUseTunnel(useSSHTunnelCheckbox.isSelected());
+        ((DBServerSettings) currentSettings).setSSHPort((Integer) sshPortSpinner.getValue());
+
+        // Database Server stuff (i.e. MySQL, PostgreSQL)
+        IDatabaseServer server = (IDatabaseServer) databaseServerComboBox.getSelectedItem();
+        ((DBServerSettings) currentSettings).setDriver(server.getDriverUrl());
+        ((DBServerSettings) currentSettings).setJDBCString(server.getConnectionString());
+        ((DBServerSettings) currentSettings).setDBIdentifier(server.getIdentifier());
+
+        storeServer(currentSettings);
+    }//GEN-LAST:event_saveServerSettingButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton addServerButton;
     private javax.swing.JButton connectButton;
     private javax.swing.JTextField connectionNameField;
     private javax.swing.JLabel connectionNameLable;
@@ -452,6 +567,7 @@ public class ConnectionManager extends javax.swing.JPanel {
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JPasswordField passwordField;
     private javax.swing.JLabel passwordLabel;
+    private javax.swing.JButton saveServerSettingButton;
     private javax.swing.JList<IDatabaseServerSettings> serverJList;
     private javax.swing.JScrollPane serverListScrollPane;
     private javax.swing.JLabel serversLabel;
@@ -473,33 +589,24 @@ public class ConnectionManager extends javax.swing.JPanel {
     private javax.swing.JLabel usernameLabel;
     // End of variables declaration//GEN-END:variables
 
-    private void storeServers() {
+    private void storeServer(IDatabaseServerSettings s) {
         // Just so we have something to test with for the time being
         Preferences servers = NbPreferences.root().node("netbeans-samples_servers");
-        Preferences tacofisk = servers.node("DBSERVER-tacofisk");
-        tacofisk.put("displayname", "Tacofisk");
-        tacofisk.put("dbhostname", "localhost");
-        tacofisk.put("dbusername", "netbeans-samples");
-        tacofisk.put("dbpassword", "secretpassword123");
-        tacofisk.put("dbname", "netbeans-samples");
-        tacofisk.putInt("dbport", 3306);
-        tacofisk.put("dbidentifier", "com.mysql");
-        tacofisk.put("jdbcurl", "jdbc:mysql://");
-        tacofisk.put("dbdriver", "org.gjt.mm.mysql.Driver");
-        tacofisk.putBoolean("useTunnel", false);
 
-        Preferences flinkgutt = servers.node("DBSERVER-flinkgutt");
-        flinkgutt.put("displayname", "flinkgutt");
-        flinkgutt.put("dbhostname", "localhost");
-        flinkgutt.put("dbname", "netbeans-samples");
-        flinkgutt.put("dbusername", "netbeans-samples");
-        flinkgutt.put("dbpassword", "secretpassword123");
-        flinkgutt.put("dbidentifier", "org.postgresql");
-        flinkgutt.put("dbdriver", "org.postgresql.Driver");
-        flinkgutt.put("jdbcurl", "jdbc:postgresql://");
-        flinkgutt.putInt("dbport", 5432);
-        flinkgutt.putBoolean("useTunnel", false);
+        String storedId = s.getStoredID();
+        
+        Preferences settings = servers.node(storedId);
+        settings.put("displayname", s.getDisplayName());
+        settings.put("dbhostname", s.getDBHostname());
+        settings.put("dbusername", s.getDBUsername());
+        settings.put("dbpassword", s.getDBPassword());
+        settings.put("dbname", s.getDBName());
+        settings.putInt("dbport", s.getDBPort());
+        settings.putBoolean("useTunnel", s.useTunnel());
 
+        settings.put("dbidentifier", s.getDBIdentifier());
+        settings.put("jdbcurl", s.getJDBCString());
+        settings.put("dbdriver", s.getDriver());
         try {
             servers.flush();
         } catch (BackingStoreException ex) {
@@ -507,7 +614,7 @@ public class ConnectionManager extends javax.swing.JPanel {
         }
     }
 
-    private List<IDatabaseServerSettings> getConfiguredServers() throws BackingStoreException {
+    private void getConfiguredServers() throws BackingStoreException {
         List<IDatabaseServerSettings> serverList = new ArrayList<IDatabaseServerSettings>();
 
         Preferences servers = NbPreferences.root().node("netbeans-samples_servers");
@@ -525,9 +632,13 @@ public class ConnectionManager extends javax.swing.JPanel {
                     se.setDbName(s.get("dbname", ""));
                     se.setDbUsername(s.get("dbusername", ""));
                     se.setDbPassword(s.get("dbpassword", ""));
+                    System.out.println("We are fetching '" + se.getDisplayName() + "' with storageID='" + specificServer + "'");
+                    se.setStorageID(specificServer);
+                    System.out.println("We have now: " + se.getStoredID() + " as the stored ID");
                     se.setDBIdentifier(s.get("dbidentifier", ""));
                     se.setDriver(s.get("dbdriver", ""));
                     se.setJDBCString(s.get("jdbcurl", ""));
+
                     se.setUseTunnel(s.getBoolean("usetunnel", false));
                     se.setSSHHostname(s.get("sshhostname", ""));
                     se.setSSHUsername(s.get("sshusername", ""));
@@ -537,6 +648,7 @@ public class ConnectionManager extends javax.swing.JPanel {
                 }
             }
         }
-        return serverList;
+        settingsEventList.clear();
+        settingsEventList.addAll(serverList);
     }
 }

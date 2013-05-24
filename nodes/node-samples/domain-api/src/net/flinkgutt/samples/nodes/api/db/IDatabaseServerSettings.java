@@ -25,4 +25,10 @@ public interface IDatabaseServerSettings {
     int getSSHPort();
 
     String getDBIdentifier();
+
+    /**
+     * Every DatabaseServerSetting needs to be stored with some unique identifier
+     * @return the identifier this server setting is stored with
+     */
+    String getStoredID();
 }

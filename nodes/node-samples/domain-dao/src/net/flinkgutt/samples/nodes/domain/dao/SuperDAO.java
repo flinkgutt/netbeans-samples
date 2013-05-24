@@ -50,7 +50,13 @@ public abstract class SuperDAO implements Lookup.Provider, IConnectionService {
         dataSource.setUrl(settings.getJDBCString() + settings.getDBHostname() + ":" + settings.getDBPort() + "/" + settings.getDBName());
         dataSource.setUsername(settings.getDBUsername());
         dataSource.setPassword(settings.getDBPassword());
-        
+        // TODO Figure out a better way to do this thing
+        if (settings.getDBIdentifier().equalsIgnoreCase("com.mysql")) {
+            selected = DBServer.MySQL;
+        } else if (settings.getDBIdentifier().equalsIgnoreCase("org.postgresql")) {
+            selected = DBServer.PostgreSQL;
+        }
+
         jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
         try {
             checkForSampleDB();
@@ -58,6 +64,7 @@ public abstract class SuperDAO implements Lookup.Provider, IConnectionService {
             Logger.getLogger(SuperDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
         // TODO check here to see if the connection is indeed intact
+        // TODO Decide if we should have PropertyListeners or Lookup-based "discovery" of the connected status of our db connection.
         pcs.firePropertyChange("connection", "disconnected", "connected");
     }
 

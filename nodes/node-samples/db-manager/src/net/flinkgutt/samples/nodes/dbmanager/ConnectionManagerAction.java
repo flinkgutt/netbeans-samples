@@ -11,7 +11,6 @@ import org.openide.DialogDisplayer;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
-import org.openide.util.Lookup;
 import org.openide.util.NbBundle.Messages;
 
 @ActionID(
@@ -24,14 +23,13 @@ import org.openide.util.NbBundle.Messages;
 @Messages("CTL_ConnectionManagerAction=Connection Manager")
 public final class ConnectionManagerAction implements ActionListener {
 
-    ConnectionManager manager = new ConnectionManager();
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
         // TODO implement action body
-        
+        ConnectionManager manager = new ConnectionManager();
         DialogDescriptor dialogDescriptor = new DialogDescriptor(manager, "Connection Manager");
         DialogDisplayer.getDefault().notify(dialogDescriptor);
-        
+        manager = null;
     }
 }
