@@ -15,13 +15,17 @@ The Nodes have the following capabilities added to them
 
 Through WeakListeners registered on the entity classes the UI is kept current.
 
-### SQL Setup
-The configuration is setup to use the following properties
+### SQL Setup (db-manager module)
+There is an Database Server Manager available in the application where you can define your server settings.
+It's limited to MySQL and PostgreSQL for now.
+There is an option for tunneling, but it's not implemented quite yet.
+On connect it sets up the small sample table needed for the Nodes, it will do this every time you connect.
 
-* Hostname: localhost
-* DB-Port: 3306 (MySQL) or 5432 (PostgreSQL)
-* Database: netbeans-samples
-* Username: netbeans-samples
-* Password: secretpassword123
 
-This can be changed in net.flinkgutt.samples.nodes.domain.dao.SuperDAO.java ("domain-dao" module) if so desired.
+### NbPreferences
+The SQL Server settings are stored using NbPreferences, so it might be something to take a gander at. 
+Located in the db-manager module.
+
+### JdbcTemplate (Database communication)
+DAOs and mapper located in the 'domain-dao' module.
+Shows one way of putting this all together, some junk code as of now.

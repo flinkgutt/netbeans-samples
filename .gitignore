@@ -14,3 +14,4 @@ rebel.xml
 /nodes/node-samples/postgresql-9.1-901.jdbc/build/
 /nodes/node-samples/spring-jdbc/build/
 /nodes/node-samples/db-manager/build/
+/nodes/node-samples/glazedlists/build/
