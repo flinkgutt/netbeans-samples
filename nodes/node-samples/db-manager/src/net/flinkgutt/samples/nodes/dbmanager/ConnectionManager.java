@@ -342,7 +342,7 @@ public class ConnectionManager extends javax.swing.JPanel {
             }
         });
 
-        addServerButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/net/flinkgutt/samples/nodes/dbmanager/1369435394_db_add.png"))); // NOI18N
+        addServerButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/net/flinkgutt/samples/nodes/dbmanager/1369435396_db_add.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(addServerButton, org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.addServerButton.text")); // NOI18N
         addServerButton.setToolTipText(org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.addServerButton.toolTipText")); // NOI18N
         addServerButton.addActionListener(new java.awt.event.ActionListener() {
@@ -390,9 +390,6 @@ public class ConnectionManager extends javax.swing.JPanel {
                         .addComponent(exitButton)))
                 .addContainerGap())
         );
-
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {connectButton, exitButton});
-
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -402,17 +399,22 @@ public class ConnectionManager extends javax.swing.JPanel {
                     .addComponent(settingsTabbedPane1)
                     .addComponent(serverListScrollPane))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(exitButton, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(connectButton)
-                            .addComponent(addServerButton)
-                            .addComponent(saveServerSettingButton))))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(exitButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(addServerButton, javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(connectButton)
+                                    .addComponent(saveServerSettingButton))))))
                 .addContainerGap())
         );
+
+        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {addServerButton, connectButton, exitButton, jButton1, saveServerSettingButton});
+
     }// </editor-fold>//GEN-END:initComponents
 
     private void useSSHTunnelCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_useSSHTunnelCheckboxActionPerformed
