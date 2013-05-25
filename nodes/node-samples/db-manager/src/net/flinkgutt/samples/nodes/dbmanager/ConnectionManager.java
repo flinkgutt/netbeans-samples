@@ -20,6 +20,7 @@ import org.openide.NotifyDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
 
 /**
@@ -27,8 +28,8 @@ import org.openide.util.NbPreferences;
  * @author Christian
  */
 public class ConnectionManager extends javax.swing.JPanel {
-    public static final String CONFIGURATION_NODE_NAME = "netbeans-samples_servers";
 
+    public static final String CONFIGURATION_NODE_NAME = "netbeans-samples_servers";
     private IConnectionService service = Lookup.getDefault().lookup(IConnectionService.class);
     private List<IDatabaseServer> databaseServers = new ArrayList<IDatabaseServer>();
     private EventList<IDatabaseServerSettings> settingsEventList = new BasicEventList<IDatabaseServerSettings>();
@@ -326,7 +327,7 @@ public class ConnectionManager extends javax.swing.JPanel {
 
         settingsTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.sshTunnelPanel.TabConstraints.tabTitle"), sshTunnelPanel); // NOI18N
 
-        connectButton.setIcon(ImageUtilities.loadImageIcon("/net/flinkgutt/samples/nodes/dbmanager/1369435792_connect_creating.png",false));
+        connectButton.setIcon(ImageUtilities.loadImageIcon("net/flinkgutt/samples/nodes/dbmanager/1369435792_connect_creating.png",false));
         org.openide.awt.Mnemonics.setLocalizedText(connectButton, org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.connectButton.text")); // NOI18N
         connectButton.setToolTipText(org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.connectButton.toolTipText")); // NOI18N
         connectButton.addActionListener(new java.awt.event.ActionListener() {
@@ -335,7 +336,7 @@ public class ConnectionManager extends javax.swing.JPanel {
             }
         });
 
-        addServerButton.setIcon(ImageUtilities.loadImageIcon("/net/flinkgutt/samples/nodes/dbmanager/1369435396_db_add.png", false));
+        addServerButton.setIcon(ImageUtilities.loadImageIcon("net/flinkgutt/samples/nodes/dbmanager/1369435396_db_add.png", false));
         org.openide.awt.Mnemonics.setLocalizedText(addServerButton, org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.addServerButton.text")); // NOI18N
         addServerButton.setToolTipText(org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.addServerButton.toolTipText")); // NOI18N
         addServerButton.addActionListener(new java.awt.event.ActionListener() {
@@ -344,7 +345,7 @@ public class ConnectionManager extends javax.swing.JPanel {
             }
         });
 
-        saveServerSettingButton.setIcon(ImageUtilities.loadImageIcon("/net/flinkgutt/samples/nodes/dbmanager/1369435663_3floppy_unmount.png",false));
+        saveServerSettingButton.setIcon(ImageUtilities.loadImageIcon("net/flinkgutt/samples/nodes/dbmanager/1369435663_3floppy_unmount.png",false));
         org.openide.awt.Mnemonics.setLocalizedText(saveServerSettingButton, org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.saveServerSettingButton.text")); // NOI18N
         saveServerSettingButton.setToolTipText(org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.saveServerSettingButton.toolTipText")); // NOI18N
         saveServerSettingButton.addActionListener(new java.awt.event.ActionListener() {
@@ -353,9 +354,10 @@ public class ConnectionManager extends javax.swing.JPanel {
             }
         });
 
-        removeServerButton.setIcon(ImageUtilities.loadImageIcon("/net/flinkgutt/samples/nodes/dbmanager/1369435531_db_remove.png", false));
+        removeServerButton.setIcon(ImageUtilities.loadImageIcon("net/flinkgutt/samples/nodes/dbmanager/1369435531_db_remove.png", false));
         org.openide.awt.Mnemonics.setLocalizedText(removeServerButton, org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.removeServerButton.text")); // NOI18N
         removeServerButton.setToolTipText(org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.removeServerButton.toolTipText")); // NOI18N
+        removeServerButton.setEnabled(false);
         removeServerButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 removeServerButtonActionPerformed(evt);
@@ -434,18 +436,13 @@ public class ConnectionManager extends javax.swing.JPanel {
 
         IDatabaseServer testServer = (IDatabaseServer) databaseServerComboBox.getSelectedItem();
 
-        /*DriverManagerDataSource dataSource = new DriverManagerDataSource();
-         dataSource.setDriverClassName(testServer.getDriverUrl());
-         dataSource.setUrl(testServer.getConnectionString() + hostnameField.getText() + ":" + dbPortField.getText() + "/" + databaseField.getText() );
-         dataSource.setUsername(usernameField.getText());
-         dataSource.setPassword( new String( passwordField.getPassword() ) );
-         NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);*/
         String dbUrl = testServer.getConnectionString() + hostnameField.getText() + ":" + dbPortField.getText() + "/" + databaseField.getText();
         String username = usernameField.getText();
         String password = new String(passwordField.getPassword());
 
         Connection connection = null;
         boolean success = true;
+        String errorMessage = "";
         try {
             Class.forName(testServer.getDriverUrl());
             connection = DriverManager.getConnection(dbUrl,
@@ -456,15 +453,17 @@ public class ConnectionManager extends javax.swing.JPanel {
              ** "Connect error"...
              */
             success = false;
+            errorMessage = ex.getMessage();
         } catch (java.lang.ClassNotFoundException ex) {
             /*
              ** "Driver error"...
              */
             success = false;
+            errorMessage = ex.getMessage();
         }
 
         if (success) {
-            NotifyDescriptor nd = new NotifyDescriptor.Message("Connection successfull!", NotifyDescriptor.INFORMATION_MESSAGE);
+            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ConnectionManager.class,"ConnectionManager.connect.success"), NotifyDescriptor.INFORMATION_MESSAGE);
             DialogDisplayer.getDefault().notifyLater(nd);
             try {
                 connection.close();
@@ -472,8 +471,7 @@ public class ConnectionManager extends javax.swing.JPanel {
                 Exceptions.printStackTrace(ex);
             }
         } else {
-            // TODO Be somewhat more helpfull in the error message
-            NotifyDescriptor nd = new NotifyDescriptor.Message("Not able to connect!", NotifyDescriptor.INFORMATION_MESSAGE);
+            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ConnectionManager.class,"ConnectionManager.connect.failure",errorMessage), NotifyDescriptor.ERROR_MESSAGE);
             DialogDisplayer.getDefault().notifyLater(nd);
         }
     }//GEN-LAST:event_testConnectionButtonActionPerformed
@@ -492,8 +490,10 @@ public class ConnectionManager extends javax.swing.JPanel {
     private void serverJListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_serverJListValueChanged
 
         if (serverJList.isSelectionEmpty()) {
+            removeServerButton.setEnabled(false);
             return;
         }
+        removeServerButton.setEnabled(true);
         // Temporarily storing the settings filled out in the view in the associated object
         int index = getIndexOfServer(currentSettings);
         if (currentSettings != null && index >= 0) {
@@ -556,15 +556,15 @@ public class ConnectionManager extends javax.swing.JPanel {
             boolean isUp = false;
             String errorMessage = "";
             try {
-            isUp = service.connect(currentSettings);
-            } catch(Exception e) {
+                isUp = service.connect(currentSettings);
+            } catch (Exception e) {
                 errorMessage = e.getMessage();
             }
             NotifyDescriptor nd = null;
             if (isUp) {
-                nd = new NotifyDescriptor.Message("Connected!", NotifyDescriptor.INFORMATION_MESSAGE);
+                nd = new NotifyDescriptor.Message(NbBundle.getMessage(ConnectionManager.class,"ConnectionManager.connect.success"), NotifyDescriptor.INFORMATION_MESSAGE);
             } else {
-                nd = new NotifyDescriptor.Message("Could not connect!\n"+errorMessage, NotifyDescriptor.ERROR_MESSAGE);
+                nd = new NotifyDescriptor.Message(NbBundle.getMessage(ConnectionManager.class,"ConnectionManager.connect.failure",errorMessage), NotifyDescriptor.ERROR_MESSAGE);
             }
             DialogDisplayer.getDefault().notify(nd);
         }
@@ -573,9 +573,11 @@ public class ConnectionManager extends javax.swing.JPanel {
     private void addServerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addServerButtonActionPerformed
         // Adds an empty server settings object to the ServerJList
         DBServerSettings newServer = new DBServerSettings();
-        newServer.setDisplayName("New Server #" + newServerCounter++);
+        newServer.setDisplayName(NbBundle.getMessage(ConnectionManager.class,"ConnectionManager.newServerDisplayName.text",newServerCounter++));
         newServer.setStorageID("DBSERVER-" + System.currentTimeMillis());
+        newServer.setSSHPort(22); // Just so it's set to the default value that's the most common.
         settingsEventList.add(newServer);
+        serverJList.setSelectedValue(newServer, true);
     }//GEN-LAST:event_addServerButtonActionPerformed
 
     private void saveServerSettingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveServerSettingButtonActionPerformed
@@ -606,9 +608,30 @@ public class ConnectionManager extends javax.swing.JPanel {
         storeServer(currentSettings);
     }//GEN-LAST:event_saveServerSettingButtonActionPerformed
 
+    // Removes the currently selected server from the list and the backing datastore
     private void removeServerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeServerButtonActionPerformed
-        // TODO add your handling code here:
-        throw new UnsupportedOperationException("Not implemented yet");
+        NotifyDescriptor nd = new NotifyDescriptor.Confirmation(NbBundle.getMessage(ConnectionManager.class,"ConnectionManager.removeServer.confirmation.body",currentSettings.getDisplayName()) , NbBundle.getMessage(ConnectionManager.class,"ConnectionManager.removeServer.confirmation.title"),
+                NotifyDescriptor.QUESTION_MESSAGE);
+        DialogDisplayer.getDefault().notify(nd);
+
+        if (nd.getValue() != NotifyDescriptor.OK_OPTION) {
+            // We do nothing because the user opted not to remove the selected server
+            // This get's called if we hit cancel or close the dialog (hit the x)
+            return;
+        }
+        // We remove the server
+        settingsEventList.remove(currentSettings);
+
+        Preferences configNode = NbPreferences.root().node(CONFIGURATION_NODE_NAME).node(currentSettings.getStoredID());
+        try {
+            configNode.removeNode();
+            configNode.flush();
+        } catch (BackingStoreException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        // Clear the fields so we're ready to enter a new server
+        clearFields();
+
     }//GEN-LAST:event_removeServerButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addServerButton;
@@ -709,5 +732,21 @@ public class ConnectionManager extends javax.swing.JPanel {
         }
         settingsEventList.clear();
         settingsEventList.addAll(serverList);
+    }
+    // Clear out the fields in the panels
+
+    private void clearFields() {
+        connectionNameField.setText("");
+        databaseField.setText("");
+        hostnameField.setText("");
+        dbPortField.setText("" + "");
+        passwordField.setText("");
+        usernameField.setText("");
+
+        sshHostnameField.setText("");
+        sshPasswordField.setText("");
+        sshPortSpinner.setValue(22);
+        sshUsernameField.setText("");
+        useSSHTunnelCheckbox.setSelected(false);
     }
 }

@@ -504,7 +504,7 @@
     <Component class="javax.swing.JButton" name="connectButton">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="ImageUtilities.loadImageIcon(&quot;/net/flinkgutt/samples/nodes/dbmanager/1369435792_connect_creating.png&quot;,false)" type="code"/>
+          <Connection code="ImageUtilities.loadImageIcon(&quot;net/flinkgutt/samples/nodes/dbmanager/1369435792_connect_creating.png&quot;,false)" type="code"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="net/flinkgutt/samples/nodes/dbmanager/Bundle.properties" key="ConnectionManager.connectButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
@@ -520,7 +520,7 @@
     <Component class="javax.swing.JButton" name="addServerButton">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="ImageUtilities.loadImageIcon(&quot;/net/flinkgutt/samples/nodes/dbmanager/1369435396_db_add.png&quot;, false)" type="code"/>
+          <Connection code="ImageUtilities.loadImageIcon(&quot;net/flinkgutt/samples/nodes/dbmanager/1369435396_db_add.png&quot;, false)" type="code"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="net/flinkgutt/samples/nodes/dbmanager/Bundle.properties" key="ConnectionManager.addServerButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
@@ -536,7 +536,7 @@
     <Component class="javax.swing.JButton" name="saveServerSettingButton">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="ImageUtilities.loadImageIcon(&quot;/net/flinkgutt/samples/nodes/dbmanager/1369435663_3floppy_unmount.png&quot;,false)" type="code"/>
+          <Connection code="ImageUtilities.loadImageIcon(&quot;net/flinkgutt/samples/nodes/dbmanager/1369435663_3floppy_unmount.png&quot;,false)" type="code"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="net/flinkgutt/samples/nodes/dbmanager/Bundle.properties" key="ConnectionManager.saveServerSettingButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
@@ -552,7 +552,7 @@
     <Component class="javax.swing.JButton" name="removeServerButton">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="ImageUtilities.loadImageIcon(&quot;/net/flinkgutt/samples/nodes/dbmanager/1369435531_db_remove.png&quot;, false)" type="code"/>
+          <Connection code="ImageUtilities.loadImageIcon(&quot;net/flinkgutt/samples/nodes/dbmanager/1369435531_db_remove.png&quot;, false)" type="code"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="net/flinkgutt/samples/nodes/dbmanager/Bundle.properties" key="ConnectionManager.removeServerButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
@@ -560,6 +560,7 @@
         <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="net/flinkgutt/samples/nodes/dbmanager/Bundle.properties" key="ConnectionManager.removeServerButton.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
+        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="removeServerButtonActionPerformed"/>
