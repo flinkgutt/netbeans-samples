@@ -5,6 +5,7 @@ import java.beans.PropertyChangeSupport;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -14,6 +15,7 @@ import java.util.logging.Logger;
 import net.flinkgutt.samples.nodes.api.IConnectionEvent;
 import net.flinkgutt.samples.nodes.api.db.IConnectionService;
 import net.flinkgutt.samples.nodes.api.db.IDatabaseServerSettings;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
@@ -39,12 +41,10 @@ public abstract class SuperDAO implements Lookup.Provider, IConnectionService {
     Lookup.Result<IDatabaseServerSettings> settingsResult = null;
 
     public SuperDAO() {
-        //result = Utilities.actionsGlobalContext().lookupResult(IConnectionEvent.class);
-        //result.addLookupListener(this);
     }
 
     @Override
-    public void connect(IDatabaseServerSettings settings) {
+    public boolean connect(IDatabaseServerSettings settings) {
         dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(settings.getDriver());
         dataSource.setUrl(settings.getJDBCString() + settings.getDBHostname() + ":" + settings.getDBPort() + "/" + settings.getDBName());
@@ -63,9 +63,19 @@ public abstract class SuperDAO implements Lookup.Provider, IConnectionService {
         } catch (IOException ex) {
             Logger.getLogger(SuperDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
-        // TODO check here to see if the connection is indeed intact
+        // Check to see if the connection is open, or rather in this case use the naive isClosed().
+        // There are ways for a connection to not be formally closed but still "closed".
+        // So while this isn't perfect, it's ok for most situations.
+        boolean isUp = true;
+        try {
+            dataSource.getConnection().isClosed();
+        } catch (SQLException ex) {
+            Exceptions.printStackTrace(ex);
+            isUp = false;
+        }
         // TODO Decide if we should have PropertyListeners or Lookup-based "discovery" of the connected status of our db connection.
         pcs.firePropertyChange("connection", "disconnected", "connected");
+        return isUp;
     }
 
     private void checkForSampleDB() throws IOException {
@@ -84,24 +94,6 @@ public abstract class SuperDAO implements Lookup.Provider, IConnectionService {
 
     }
 
-    /**
-     * @Override public void resultChanged(LookupEvent ev) {
-     *
-     * System.out.println("LookupEvent: " + ev.getSource()); Lookup.Result r =
-     * (Lookup.Result) ev.getSource();
-     *
-     * Collection instances = r.allInstances(); for (Iterator it =
-     * instances.iterator(); it.hasNext();) { Object object = it.next();
-     * System.out.println("\tInstance of " + object.getClass()); }
-     *
-     * Collection<IConnectionEvent> events = r.allInstances();
-     * System.out.println("events.size() => " + events.size()); if
-     * (events.size() == 1) { IConnectionEvent event = events.iterator().next();
-     * if (event.getEvent() == IConnectionEvent.CONNECT) { //connect(); } else
-     * if (event.getEvent() == IConnectionEvent.DISCONNECT) { //disconnect(); //
-     * TODO Implement a disconnect, or not. } } // if correct event, call
-     * connect() }
-     */
     private String[] removeEmptyLines(String file) throws FileNotFoundException {
         String text = "";
         InputStream is = getClass().getResourceAsStream(file);
