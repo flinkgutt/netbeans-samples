@@ -21,6 +21,7 @@ public class Category implements ICategory {
     private List<ICategory> children = new ArrayList<ICategory>();
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private ICategory parent;
+    private int sortOrder = 0;
 
     public Category(Integer id, ICategory parent, String categoryName) {
         categoryID = id;
@@ -112,4 +113,16 @@ public class Category implements ICategory {
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         pcs.removePropertyChangeListener(listener);
     }
+
+    @Override
+    public int getSortOrder() {
+        return sortOrder;
+    }
+
+    @Override
+    public void setSortOrder(int sortOrder) {
+        this.sortOrder = sortOrder;
+    }
+    
+    
 }

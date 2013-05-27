@@ -33,4 +33,8 @@ public interface ICategory {
     void setDescription(String description);
 
     void setChildren(List<ICategory> categories);
+
+    int getSortOrder();
+
+    void setSortOrder(int sortOrder);
 }

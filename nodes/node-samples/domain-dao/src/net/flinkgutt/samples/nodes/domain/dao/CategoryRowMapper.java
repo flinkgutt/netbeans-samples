@@ -30,6 +30,7 @@ class CategoryRowMapper implements RowMapper<Category> {
         c.setCategoryID(rs.getInt("category_id"));
         c.setName(rs.getString("category_name"));
         c.setDescription(rs.getString("category_description"));
+        c.setSortOrder(rs.getInt("sort_order"));
         if(parent != null) {
             c.setParent(parent);
         }

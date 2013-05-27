@@ -25,7 +25,7 @@ public class CategoryDAO extends SuperDAO implements ICategoryDAO<Category> {
 
     @Override
     public List<Category> getCategoriesWithParent(Category parent) {
-        String getCategoriesWithParentQuery = "SELECT category_id, category_name, category_description, active FROM categories WHERE parent_id=:parentId";
+        String getCategoriesWithParentQuery = "SELECT category_id, category_name, category_description, active, sort_order FROM categories WHERE parent_id=:parentId";
         MapSqlParameterSource params = new MapSqlParameterSource("parentId", parent.getCategoryID());
         return jdbcTemplate.query(getCategoriesWithParentQuery, params, new CategoryRowMapper(parent));
     }
@@ -74,12 +74,13 @@ public class CategoryDAO extends SuperDAO implements ICategoryDAO<Category> {
     @Override
     public void update(Category category) {
         String updateCategoryQuery = "UPDATE categories "
-                + "SET category_name=:name, category_description=:description, parent_id=:parentId " 
+                + "SET category_name=:name, category_description=:description, parent_id=:parentId, sort_order=:sortOrder " 
                 + "WHERE category_id=:categoryId";
         MapSqlParameterSource params = new MapSqlParameterSource("name", category.getName())
                 .addValue("description", category.getDescription())
                 .addValue("parentId",category.getParentID())
-                .addValue("categoryId",category.getCategoryID());
+                .addValue("categoryId",category.getCategoryID())
+                .addValue("sortOrder", category.getSortOrder());
         int rowsAffected = jdbcTemplate.update(updateCategoryQuery, params);
         
         // TODO Look into if this function should return a boolean
@@ -87,10 +88,11 @@ public class CategoryDAO extends SuperDAO implements ICategoryDAO<Category> {
     
     @Override
     public boolean addCategory(Category category) {
-        String insertCategoryQuery = "INSERT INTO categories (category_name, category_description, parent_id ) VALUES(:name, :description, :parentId)";
+        String insertCategoryQuery = "INSERT INTO categories (category_name, category_description, parent_id, sort_order ) VALUES(:name, :description, :parentId, :sortOrder)";
         MapSqlParameterSource params = new MapSqlParameterSource("name", category.getName())
                 .addValue("description", category.getDescription())
                 .addValue("parentId",category.getParentID() )
+                .addValue("sortOrder",category.getSortOrder())
                 ;
         KeyHolder key = new GeneratedKeyHolder();
         int rowsAffected = jdbcTemplate.update(insertCategoryQuery, params, key);

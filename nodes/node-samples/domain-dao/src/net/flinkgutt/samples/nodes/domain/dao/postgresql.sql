@@ -6,7 +6,7 @@ CREATE TABLE categories (
 	category_name VARCHAR(100),
 	category_description TEXT,
 	active BOOLEAN DEFAULT TRUE,
-
+        sort_order INTEGER DEFAULT 0,
 PRIMARY KEY("category_id")
 );
 
