@@ -7,6 +7,7 @@ package net.flinkgutt.samples.nodes.domain.entities;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import net.flinkgutt.samples.nodes.api.ICategory;
 
@@ -32,6 +33,21 @@ public class Category implements ICategory {
     public Category() {
     }
 
+    @Override
+    public void reorder(int[] perm) {
+        ICategory[] reordered = new Category[children.size()];
+        for (int i = 0; i < perm.length; i++) {
+            int j = perm[i];
+            ICategory c = children.get(i);
+            c.setSortOrder(j);
+            reordered[j] = c;
+        }
+        
+        children = new ArrayList<ICategory>();
+        children.addAll(Arrays.asList(reordered));
+        pcs.firePropertyChange("children", null, children);
+    }
+    
     @Override
     public Integer getCategoryID() {
         return categoryID;
@@ -95,13 +111,13 @@ public class Category implements ICategory {
     @Override
     public void addChild(ICategory child) {
         children.add(child);
-        pcs.firePropertyChange("children", null, child);
+        pcs.firePropertyChange("children", null, children);
     }
 
     @Override
     public void removeChild(ICategory child) {
         children.remove(child);
-        pcs.firePropertyChange("children", child, null);
+        pcs.firePropertyChange("children", child, children);
     }
 
     @Override

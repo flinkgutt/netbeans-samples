@@ -112,13 +112,26 @@ public abstract class SuperDAO implements Lookup.Provider, IConnectionService {
         return arr.toArray(new String[arr.size()]);
     }
 
+    @Override
     public void addPropertyChangeListener(PropertyChangeListener pcl) {
         pcs.addPropertyChangeListener(pcl);
     }
-
+    @Override
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener pcl) {
+        pcs.addPropertyChangeListener(propertyName, pcl);
+    }
+    
+    @Override
     public void removePropertyChangelistener(PropertyChangeListener plc) {
         pcs.removePropertyChangeListener(plc);
     }
+    
+    @Override
+    public void removePropertyChangelistener(String propertyName, PropertyChangeListener plc) {
+        pcs.removePropertyChangeListener(propertyName, plc);
+    }
+    
+    
     InstanceContent ic = new InstanceContent();
     AbstractLookup lookup = new AbstractLookup(ic);
 

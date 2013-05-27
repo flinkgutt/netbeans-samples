@@ -22,4 +22,6 @@ public interface ICategoryDAO<T extends ICategory> {
     void update(T category);
 
     boolean addCategory(T category);
+
+    void updateChildrenSortOrder(T parent);
 }

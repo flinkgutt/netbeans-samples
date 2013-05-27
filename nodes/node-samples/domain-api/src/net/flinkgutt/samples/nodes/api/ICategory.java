@@ -37,4 +37,6 @@ public interface ICategory {
     int getSortOrder();
 
     void setSortOrder(int sortOrder);
+
+    void reorder(int[] perm);
 }
