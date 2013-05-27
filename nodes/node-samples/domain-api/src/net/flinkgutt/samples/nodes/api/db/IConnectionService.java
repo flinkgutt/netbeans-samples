@@ -15,4 +15,6 @@ public interface IConnectionService {
 
     void removePropertyChangelistener(PropertyChangeListener plc);
     void removePropertyChangelistener(String propertyName, PropertyChangeListener plc);
+
+    boolean isConnected();
 }

@@ -8,17 +8,21 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import net.flinkgutt.samples.nodes.api.ICategory;
 import net.flinkgutt.samples.nodes.api.ICategoryDAO;
+
 import net.flinkgutt.samples.nodes.api.db.IConnectionService;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.ExplorerUtils;
-import org.openide.nodes.Children;
 import org.openide.nodes.Node;
 import org.openide.util.Lookup;
+import org.openide.util.LookupEvent;
+import org.openide.util.LookupListener;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
+import org.openide.util.Utilities;
+import org.openide.util.WeakListeners;
 import org.openide.util.lookup.InstanceContent;
 
 /**
@@ -31,7 +35,7 @@ import org.openide.util.lookup.InstanceContent;
         preferredID = "ReOrderTopComponent",
         //iconBase="SET/PATH/TO/ICON/HERE", 
         persistenceType = TopComponent.PERSISTENCE_ALWAYS)
-@TopComponent.Registration(mode = "explorer", openAtStartup = true)
+@TopComponent.Registration(mode = "explorer", openAtStartup = false)
 @ActionID(category = "Window", id = "net.flinkgutt.samples.nodes.view.reorder.ReOrderTopComponent")
 @ActionReference(path = "Menu/Window" /*, position = 333 */)
 @TopComponent.OpenActionRegistration(
@@ -116,10 +120,18 @@ public final class ReOrderTopComponent extends TopComponent implements ExplorerM
     private javax.swing.JButton refreshButton;
     // End of variables declaration//GEN-END:variables
 
+    
+    
     @Override
     public void componentOpened() {
-        connection.addPropertyChangeListener("connection", this);
-
+        connection.addPropertyChangeListener("connection", WeakListeners.propertyChange(this,connection));
+        
+        // check if we allready are connected
+        if( connection.isConnected() ) {
+            System.out.println("isConnected!");
+            refreshTree();
+        }
+        
     }
 
     @Override

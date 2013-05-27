@@ -1,9 +1,11 @@
 
 package net.flinkgutt.samples.nodes.view.beantree;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import net.flinkgutt.samples.nodes.api.ICategory;
 import net.flinkgutt.samples.nodes.api.ICategoryDAO;
-import net.flinkgutt.samples.nodes.api.IConnectionEvent;
+import net.flinkgutt.samples.nodes.api.db.IConnectionService;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -11,11 +13,9 @@ import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.ExplorerUtils;
 import org.openide.nodes.Node;
 import org.openide.util.Lookup;
-import org.openide.util.LookupEvent;
-import org.openide.util.LookupListener;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
-import org.openide.util.Utilities;
+import org.openide.util.WeakListeners;
 
 /**
  * Top component which displays something.
@@ -38,10 +38,11 @@ import org.openide.util.Utilities;
     "CTL_BeanTreeTopComponent=BeanTree Window",
     "HINT_BeanTreeTopComponent=This is a BeanTree window"
 })
-public final class BeanTreeTopComponent extends TopComponent implements ExplorerManager.Provider, LookupListener {
+public final class BeanTreeTopComponent extends TopComponent implements ExplorerManager.Provider, PropertyChangeListener {
 
     private ICategoryDAO categoryDAO = Lookup.getDefault().lookup(ICategoryDAO.class);
     private ExplorerManager em = new ExplorerManager();
+    private IConnectionService connection = Lookup.getDefault().lookup(IConnectionService.class);
     
     public BeanTreeTopComponent() {
         initComponents();
@@ -109,17 +110,19 @@ public final class BeanTreeTopComponent extends TopComponent implements Explorer
     private org.openide.explorer.view.BeanTreeView categoryBeanTreeView;
     private javax.swing.JButton refreshButton;
     // End of variables declaration//GEN-END:variables
-    Lookup.Result<IConnectionEvent> result = null;
+    
     @Override
     public void componentOpened() {
-        // TODO add custom code on component opening
-        result = Utilities.actionsGlobalContext().lookupResult(IConnectionEvent.class);
-        result.addLookupListener(this);
+        connection.addPropertyChangeListener("connection",WeakListeners.propertyChange(this,connection));
+        // If we are connected, start anything that needs to be started
+        if( connection.isConnected()) {
+            refreshTree();
+        }
     }
 
     @Override
     public void componentClosed() {
-        // TODO add custom code on component closing
+        connection.removePropertyChangelistener("connection", this);
     }
 
     void writeProperties(java.util.Properties p) {
@@ -140,7 +143,11 @@ public final class BeanTreeTopComponent extends TopComponent implements Explorer
     }
 
     @Override
-    public void resultChanged(LookupEvent ev) {
-        System.out.println("BeanTreeTopComponent->resultChanged! " + ev.getSource());
+    public void propertyChange(PropertyChangeEvent evt) {
+        // if we have just connected to the db, use it!
+        if(evt.getPropertyName().equals("connection")) {
+            refreshTree();
+        }
     }
+
 }

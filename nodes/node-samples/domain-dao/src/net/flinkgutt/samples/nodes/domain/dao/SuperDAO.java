@@ -12,13 +12,11 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.flinkgutt.samples.nodes.api.IConnectionEvent;
+
 import net.flinkgutt.samples.nodes.api.db.IConnectionService;
 import net.flinkgutt.samples.nodes.api.db.IDatabaseServerSettings;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
-import org.openide.util.lookup.AbstractLookup;
-import org.openide.util.lookup.InstanceContent;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
@@ -26,18 +24,17 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
  *
  * @author Christian
  */
-public abstract class SuperDAO implements Lookup.Provider, IConnectionService {
+public abstract class SuperDAO implements IConnectionService {
 
     NamedParameterJdbcTemplate jdbcTemplate;
     private DriverManagerDataSource dataSource;
-
+    boolean isConnected = false;
     public enum DBServer {
 
         MySQL, PostgreSQL
     }
     public DBServer selected = DBServer.MySQL;
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
-    Lookup.Result<IConnectionEvent> result = null;
     Lookup.Result<IDatabaseServerSettings> settingsResult = null;
 
     public SuperDAO() {
@@ -73,8 +70,9 @@ public abstract class SuperDAO implements Lookup.Provider, IConnectionService {
             Exceptions.printStackTrace(ex);
             isUp = false;
         }
-        // TODO Decide if we should have PropertyListeners or Lookup-based "discovery" of the connected status of our db connection.
+        
         pcs.firePropertyChange("connection", "disconnected", "connected");
+        isConnected = true;
         return isUp;
     }
 
@@ -131,12 +129,8 @@ public abstract class SuperDAO implements Lookup.Provider, IConnectionService {
         pcs.removePropertyChangeListener(propertyName, plc);
     }
     
-    
-    InstanceContent ic = new InstanceContent();
-    AbstractLookup lookup = new AbstractLookup(ic);
-
     @Override
-    public Lookup getLookup() {
-        return lookup;
+    public boolean isConnected() {
+        return isConnected;
     }
 }
