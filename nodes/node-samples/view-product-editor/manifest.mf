@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+OpenIDE-Module: net.flinkgutt.samples.nodes.view.product
+OpenIDE-Module-Localizing-Bundle: net/flinkgutt/samples/nodes/view/product/Bundle.properties
+OpenIDE-Module-Requires: org.openide.windows.WindowManager
+OpenIDE-Module-Specification-Version: 1.0
+

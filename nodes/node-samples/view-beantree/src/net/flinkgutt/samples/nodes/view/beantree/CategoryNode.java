@@ -15,6 +15,7 @@ import org.openide.nodes.Children;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.WeakListeners;
+import org.openide.util.lookup.Lookups;
 
 /**
  *
@@ -30,7 +31,7 @@ public class CategoryNode extends AbstractNode implements PropertyChangeListener
     }
 
     public CategoryNode(ICategory category) {
-        super(Children.create(new CategoryChildFactory(category), true), Lookup.EMPTY);
+        super(Children.create(new CategoryChildFactory(category), true), Lookups.singleton(category));
         this.category = category;
         this.category.addPropertyChangeListener(WeakListeners.propertyChange(this, this.category));
     }

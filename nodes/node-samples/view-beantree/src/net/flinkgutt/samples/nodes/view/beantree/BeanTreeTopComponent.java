@@ -3,7 +3,7 @@ package net.flinkgutt.samples.nodes.view.beantree;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import net.flinkgutt.samples.nodes.api.ICategory;
+import javax.swing.ActionMap;
 import net.flinkgutt.samples.nodes.api.ICategoryDAO;
 import net.flinkgutt.samples.nodes.api.db.IConnectionService;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -11,7 +11,6 @@ import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.ExplorerUtils;
-import org.openide.nodes.Node;
 import org.openide.util.Lookup;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
@@ -49,9 +48,8 @@ public final class BeanTreeTopComponent extends TopComponent implements Explorer
         setName(Bundle.CTL_BeanTreeTopComponent());
         setToolTipText(Bundle.HINT_BeanTreeTopComponent());
         
-        associateLookup(ExplorerUtils.createLookup(em, getActionMap()));
         categoryBeanTreeView.setRootVisible(false);
-        //refreshTree();
+        associateLookup(ExplorerUtils.createLookup(em, getActionMap()));
     }
     
     private void refreshTree() {
@@ -59,9 +57,7 @@ public final class BeanTreeTopComponent extends TopComponent implements Explorer
         if(categoryDAO == null) { 
             return; // Or we could try one more time to find an implementation
         }
-        ICategory rootCategory = categoryDAO.getRootCategory();
-        Node rootNode = new CategoryNode(rootCategory);
-        em.setRootContext(rootNode);
+        em.setRootContext(new CategoryNode(categoryDAO.getRootCategory()));
     }
     
     /**
@@ -139,6 +135,7 @@ public final class BeanTreeTopComponent extends TopComponent implements Explorer
 
     @Override
     public ExplorerManager getExplorerManager() {
+        System.out.println("GETEXPLORERMANAGER!!!!");
         return em;
     }
 

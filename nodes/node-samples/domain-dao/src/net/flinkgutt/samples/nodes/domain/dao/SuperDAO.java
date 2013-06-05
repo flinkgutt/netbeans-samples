@@ -26,7 +26,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
  */
 public abstract class SuperDAO implements IConnectionService {
 
-    NamedParameterJdbcTemplate jdbcTemplate;
+    static NamedParameterJdbcTemplate jdbcTemplate;
     private DriverManagerDataSource dataSource;
     boolean isConnected = false;
     public enum DBServer {
@@ -36,10 +36,10 @@ public abstract class SuperDAO implements IConnectionService {
     public DBServer selected = DBServer.MySQL;
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     Lookup.Result<IDatabaseServerSettings> settingsResult = null;
-
+    
     public SuperDAO() {
     }
-
+    
     @Override
     public boolean connect(IDatabaseServerSettings settings) {
         dataSource = new DriverManagerDataSource();

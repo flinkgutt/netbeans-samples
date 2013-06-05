@@ -9,6 +9,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.DefaultComboBoxModel;
@@ -34,7 +36,8 @@ public class ConnectionManager extends javax.swing.JPanel {
     private List<IDatabaseServer> databaseServers = new ArrayList<IDatabaseServer>();
     private EventList<IDatabaseServerSettings> settingsEventList = new BasicEventList<IDatabaseServerSettings>();
     private DefaultEventListModel<IDatabaseServerSettings> settingsModel = GlazedListsSwing.eventListModel(settingsEventList);
-
+    private static final Logger logger = Logger.getLogger(ConnectionManager.class.getName());
+    
     /**
      * Creates new form ConnectionManager
      */
@@ -557,10 +560,11 @@ public class ConnectionManager extends javax.swing.JPanel {
             String errorMessage = "";
             try {
                 isUp = service.connect(currentSettings);
-            } catch (Exception e) {
+            } catch (Exception e) { // This is bad, don't do this.
                 errorMessage = e.getMessage();
+                logger.log(Level.SEVERE,"Error during either connection to server or during DB creation.", e);
             }
-            NotifyDescriptor nd = null;
+            NotifyDescriptor nd;
             if (isUp) {
                 nd = new NotifyDescriptor.Message(NbBundle.getMessage(ConnectionManager.class,"ConnectionManager.connect.success"), NotifyDescriptor.INFORMATION_MESSAGE);
             } else {
