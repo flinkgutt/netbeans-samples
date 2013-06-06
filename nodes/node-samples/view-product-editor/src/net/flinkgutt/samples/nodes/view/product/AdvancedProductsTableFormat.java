@@ -30,7 +30,7 @@ class AdvancedProductsTableFormat implements TableFormat<IProduct> {
     @Override
     public String getColumnName(int column) {
         switch (column) {
-            case 0: return product_table_header_id();
+            case 0: return product_table_header_id(); // Messages defined above in the @Messages() annotation. See import section.
             case 1: return product_table_header_name();
             case 2: return product_table_header_sortorder();
             case 3: return product_table_header_active();
