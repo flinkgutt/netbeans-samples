@@ -10,6 +10,7 @@ public class Product implements IProduct {
     
     private int productID;
     private String name;
+    private String description;
     private boolean active;
     private int sortOrder;
 
@@ -23,6 +24,16 @@ public class Product implements IProduct {
         this.name = name;
     }
 
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    
     @Override
     public int getProductID() {
         return productID;
