@@ -4,6 +4,10 @@ import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.swing.EventJXTableModel;
 import java.util.Collection;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import net.flinkgutt.samples.nodes.api.ICategory;
 import net.flinkgutt.samples.nodes.api.IProduct;
 import net.flinkgutt.samples.nodes.api.IProductDAO;
@@ -60,38 +64,62 @@ public final class ProductEditorTopComponent extends TopComponent implements Loo
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jXTable1 = new org.jdesktop.swingx.JXTable();
+        scrollPaneProductTable = new javax.swing.JScrollPane();
+        productTable = new org.jdesktop.swingx.JXTable();
+        productDescriptionLabel = new javax.swing.JLabel();
+        scrollPaneProductDescription = new javax.swing.JScrollPane();
+        productDescriptionArea = new javax.swing.JTextArea();
 
-        jXTable1.setModel(productsTableModel);
-        jXTable1.setHighlighters(HighlighterFactory.createSimpleStriping());
-        jScrollPane1.setViewportView(jXTable1);
+        productTable.setModel(productsTableModel);
+        productTable.setHighlighters(HighlighterFactory.createSimpleStriping());
+        scrollPaneProductTable.setViewportView(productTable);
+        productTable.getSelectionModel().addListSelectionListener(new ProductRowSelectionListener());
+
+        org.openide.awt.Mnemonics.setLocalizedText(productDescriptionLabel, org.openide.util.NbBundle.getMessage(ProductEditorTopComponent.class, "ProductEditorTopComponent.productDescriptionLabel.text")); // NOI18N
+
+        productDescriptionArea.setColumns(20);
+        productDescriptionArea.setRows(5);
+        scrollPaneProductDescription.setViewportView(productDescriptionArea);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .addComponent(scrollPaneProductTable, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(productDescriptionLabel)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(scrollPaneProductDescription, javax.swing.GroupLayout.Alignment.TRAILING)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 389, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(scrollPaneProductTable, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(productDescriptionLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(scrollPaneProductDescription, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JScrollPane jScrollPane1;
-    private org.jdesktop.swingx.JXTable jXTable1;
+    private javax.swing.JTextArea productDescriptionArea;
+    private javax.swing.JLabel productDescriptionLabel;
+    private org.jdesktop.swingx.JXTable productTable;
+    private javax.swing.JScrollPane scrollPaneProductDescription;
+    private javax.swing.JScrollPane scrollPaneProductTable;
     // End of variables declaration//GEN-END:variables
     @Override
     public void componentOpened() {
+        // We add this TopComponent as a LookupListener every time this TC is opened. See componentClosed().
         categoryResult = Utilities.actionsGlobalContext().lookupResult(ICategory.class);
         categoryResult.addLookupListener (this);
     }
 
     @Override
     public void componentClosed() {
-        // TODO add custom code on component closing
+        // We remove this TopComponent as a LookupListener every time this TC is closed.
         categoryResult.removeLookupListener(this);
     }
 
@@ -115,6 +143,8 @@ public final class ProductEditorTopComponent extends TopComponent implements Loo
             if (category == null) {
                 return;
             }
+            productDescriptionArea.setText(""); // Clear the text area when we select something else. it just looks wierd otherwise.
+            // TODO if the state of the description is dirty we should ask what to do before we do anything.
             try {
             productEventList.getReadWriteLock().writeLock().lock();
             productEventList.clear();
@@ -124,5 +154,20 @@ public final class ProductEditorTopComponent extends TopComponent implements Loo
             }
         }
         
+    }    
+    
+    private class ProductRowSelectionListener implements ListSelectionListener {
+
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            if (e.getValueIsAdjusting()) {
+                return;
+            }
+            if (productTable.getSelectedRowCount() > 0) {
+                final int modelRowNum = productTable.convertRowIndexToModel(productTable.getSelectedRow());
+                final IProduct p = productsTableModel.getElementAt(modelRowNum);
+                productDescriptionArea.setText(p.getDescription());
+            }
+        }
     }
 }
