@@ -24,6 +24,8 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
  *
  * @author Christian
  */
+// TODO Look into utilizing the NamedParameterJdbcDaoSupport class.
+// TODO Clean up the code
 public abstract class SuperDAO implements IConnectionService {
 
     static NamedParameterJdbcTemplate jdbcTemplate;
@@ -33,9 +35,9 @@ public abstract class SuperDAO implements IConnectionService {
 
         MySQL, PostgreSQL
     }
-    public DBServer selected = DBServer.MySQL;
+    public DBServer selected;
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
-    Lookup.Result<IDatabaseServerSettings> settingsResult = null;
+    Lookup.Result<IDatabaseServerSettings> settingsResult;
     
     public SuperDAO() {
     }
@@ -93,7 +95,7 @@ public abstract class SuperDAO implements IConnectionService {
     }
 
     private String[] removeEmptyLines(String file) throws FileNotFoundException {
-        String text = "";
+        String text;
         InputStream is = getClass().getResourceAsStream(file);
         text = new Scanner(is, "UTF-8").useDelimiter("\\A").next();
 
