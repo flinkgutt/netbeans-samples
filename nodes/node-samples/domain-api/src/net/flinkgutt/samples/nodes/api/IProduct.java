@@ -1,5 +1,7 @@
 package net.flinkgutt.samples.nodes.api;
 
+import java.math.BigDecimal;
+
 /**
  *
  * @author Christian
@@ -22,4 +24,8 @@ public interface IProduct {
     void setActive(boolean active);
 
     void setSortOrder(int sortOrder);
+
+    BigDecimal getPrice();
+
+    void setPrice(BigDecimal price);
 }

@@ -1,5 +1,6 @@
 package net.flinkgutt.samples.nodes.domain.entities;
 
+import java.math.BigDecimal;
 import net.flinkgutt.samples.nodes.api.IProduct;
 
 /**
@@ -13,7 +14,8 @@ public class Product implements IProduct {
     private String description;
     private boolean active;
     private int sortOrder;
-
+    private BigDecimal price;
+    
     @Override
     public String getName() {
         return name;
@@ -61,6 +63,14 @@ public class Product implements IProduct {
     @Override
     public void setSortOrder(int sortOrder) {
         this.sortOrder = sortOrder;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
     
     

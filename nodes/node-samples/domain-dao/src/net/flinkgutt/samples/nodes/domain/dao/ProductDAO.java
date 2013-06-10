@@ -2,6 +2,7 @@ package net.flinkgutt.samples.nodes.domain.dao;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.flinkgutt.samples.nodes.api.IProduct;
 import net.flinkgutt.samples.nodes.api.IProductDAO;
 import net.flinkgutt.samples.nodes.domain.entities.Category;
 import net.flinkgutt.samples.nodes.domain.entities.Product;
@@ -24,5 +25,30 @@ public class ProductDAO extends SuperDAO implements IProductDAO<Product, Categor
         MapSqlParameterSource params = new MapSqlParameterSource("categoryId", category.getCategoryID());
         return jdbcTemplate.query(getProductsInCategoryQuery, params, new ProductRowMapper());
     }
-    
+
+    @Override
+    public boolean save(Product product) {
+        // TODO Update products_to_categories table as well. It's not currently possible to change a products category, so it's not implemented yet.
+        if(product == null) {
+            throw new IllegalArgumentException("Product can't be null");
+        }
+        // If product does not exist, we should hand it over to another method to handle it's insert.
+        if(product.getProductID() == 0) {
+            // insertProduct-method
+            return false;
+        }
+        String updateProductQuery = "UPDATE products SET product_name = :name, product_description = :description, product_price=:price, active=:active, sort_order=:sortOrder "
+                + "WHERE product_id = :productId";
+        MapSqlParameterSource params = new MapSqlParameterSource("name", product.getName());
+        params.addValue("description", product.getDescription()).
+                addValue("price", product.getPrice()).
+                addValue("active", product.isActive()).
+                addValue("sortOrder",product.getSortOrder()).
+                addValue("productId", product.getProductID());
+        int rowsAffected = jdbcTemplate.update(updateProductQuery, params);
+        if(rowsAffected > 0) {
+            return true;
+        }
+        return false;
+    }
 }

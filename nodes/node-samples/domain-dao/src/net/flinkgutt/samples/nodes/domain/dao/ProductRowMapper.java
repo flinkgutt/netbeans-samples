@@ -19,6 +19,7 @@ class ProductRowMapper implements RowMapper<Product> {
         p.setDescription(rs.getString("product_description"));
         p.setActive(rs.getBoolean("active"));
         p.setSortOrder(rs.getInt("sort_order"));
+        p.setPrice(rs.getBigDecimal("product_price"));
         return p;
     }
     
