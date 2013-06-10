@@ -15,3 +15,7 @@ rebel.xml
 /nodes/node-samples/spring-jdbc/build/
 /nodes/node-samples/db-manager/build/
 /nodes/node-samples/glazedlists/build/
+/nodes/node-samples/view-reorder-nodes/build/
+/nodes/node-samples/view-product-editor/build/
+/nodes/node-samples/swingx/build/
+/nodes/node-samples/view-product-editor/nbproject/private/

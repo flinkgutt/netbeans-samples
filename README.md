@@ -3,6 +3,7 @@ netbeans-samples
 Netbeans Platform samples
 
 Here you'll find fully working Netbeans Platform based application demos on how to accomplish different pretty standard application features.
+It's nowhere near complete or ready to be used as an example for most things, but it's a start for a discussion and hopefully some community participation. :-)
 
 ## nodes/node-samples
 Shows a BeanTreeView backed by a SQL database through a loosely coupled DAO implementation. 
@@ -14,6 +15,10 @@ The Nodes have the following capabilities added to them
 * Delete/remove category
 
 Through WeakListeners registered on the entity classes the UI is kept current.
+
+### Undo/Redo + Savable
+ProductEditor now supports undo/redo for product name and description (in the "editor" part, not the table).
+It's just a very simple example and could use some usability improvements. Warning when changing into a fresh state from a dirty one etc.
 
 ### SQL Setup (db-manager module)
 There is an Database Server Manager available in the application where you can define your server settings.
