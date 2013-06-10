@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.flinkgutt.samples.nodes.view.product;
 
 import ca.odell.glazedlists.gui.TableFormat;
@@ -20,20 +16,22 @@ class AdvancedProductsTableFormat implements TableFormat<IProduct> {
 
     @Override
     public int getColumnCount() {
-        return 4;
+        return 5;
     }
 
     @Messages({"product.table.header.id=ID",
     "product.table.header.name=Name",
     "product.table.header.sortorder=Sort Order",
-    "product.table.header.active=Active"})
+    "product.table.header.active=Active",
+    "product.table.header.price=Price"})
     @Override
     public String getColumnName(int column) {
         switch (column) {
             case 0: return product_table_header_id(); // Messages defined above in the @Messages() annotation. See import section.
             case 1: return product_table_header_name();
             case 2: return product_table_header_sortorder();
-            case 3: return product_table_header_active();
+            case 3: return product_table_header_price();
+            case 4: return product_table_header_active();
             default: return "";
         }
     }
@@ -44,7 +42,8 @@ class AdvancedProductsTableFormat implements TableFormat<IProduct> {
             case 0: return product.getProductID();
             case 1: return product.getName();
             case 2: return product.getSortOrder();
-            case 3: return product.isActive();
+            case 3: return product.getPrice();
+            case 4: return product.isActive();
             default: return "";
         }
     }
