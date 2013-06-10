@@ -3,24 +3,29 @@ package net.flinkgutt.samples.nodes.view.product;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.swing.EventJXTableModel;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.util.Collection;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import net.flinkgutt.samples.nodes.api.ICategory;
 import net.flinkgutt.samples.nodes.api.IProduct;
 import net.flinkgutt.samples.nodes.api.IProductDAO;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.netbeans.api.settings.ConvertAsProperties;
+import org.netbeans.spi.actions.AbstractSavable;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
+import org.openide.awt.UndoRedo;
 import org.openide.util.Lookup;
 import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.Utilities;
+import org.openide.util.lookup.AbstractLookup;
+import org.openide.util.lookup.InstanceContent;
 
 /**
  * Top component which displays something.
@@ -44,18 +49,42 @@ import org.openide.util.Utilities;
     "HINT_ProductEditorTopComponent=This is a ProductEditor window"
 })
 public final class ProductEditorTopComponent extends TopComponent implements LookupListener {
+
     private IProductDAO productDAO = Lookup.getDefault().lookup(IProductDAO.class);
     private EventList<IProduct> productEventList = new BasicEventList<IProduct>();
-    private EventJXTableModel<IProduct> productsTableModel = new EventJXTableModel<IProduct>(productEventList,new AdvancedProductsTableFormat());
+    private EventJXTableModel<IProduct> productsTableModel = new EventJXTableModel<IProduct>(productEventList, new AdvancedProductsTableFormat());
     private Lookup.Result<ICategory> categoryResult = null;
-    
+    private InstanceContent ic = new InstanceContent();
+    private UndoRedo.Manager manager = new UndoRedo.Manager();
+    private IProduct currentProduct;
+
     public ProductEditorTopComponent() {
         initComponents();
         setName(Bundle.CTL_ProductEditorTopComponent());
         setToolTipText(Bundle.HINT_ProductEditorTopComponent());
-
+        associateLookup(new AbstractLookup(ic));
+        productDescriptionArea.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                modify();
+            }
+        });
+        productName.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                modify();
+            }
+        });
+        productDescriptionArea.getDocument().addUndoableEditListener(manager);
+        productName.getDocument().addUndoableEditListener(manager);
     }
 
+    @Override
+    public UndoRedo getUndoRedo() {
+        return manager;
+    }
+    
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -69,6 +98,8 @@ public final class ProductEditorTopComponent extends TopComponent implements Loo
         productDescriptionLabel = new javax.swing.JLabel();
         scrollPaneProductDescription = new javax.swing.JScrollPane();
         productDescriptionArea = new javax.swing.JTextArea();
+        jLabel1 = new javax.swing.JLabel();
+        productName = new javax.swing.JTextField();
 
         productTable.setModel(productsTableModel);
         productTable.setHighlighters(HighlighterFactory.createSimpleStriping());
@@ -81,40 +112,53 @@ public final class ProductEditorTopComponent extends TopComponent implements Loo
         productDescriptionArea.setRows(5);
         scrollPaneProductDescription.setViewportView(productDescriptionArea);
 
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(ProductEditorTopComponent.class, "ProductEditorTopComponent.jLabel1.text")); // NOI18N
+
+        productName.setText(org.openide.util.NbBundle.getMessage(ProductEditorTopComponent.class, "ProductEditorTopComponent.productName.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(scrollPaneProductTable, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(productDescriptionLabel)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addComponent(scrollPaneProductDescription, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(productDescriptionLabel)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(productName))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(scrollPaneProductTable, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
+                .addComponent(scrollPaneProductTable, javax.swing.GroupLayout.DEFAULT_SIZE, 172, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(productName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(productDescriptionLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scrollPaneProductDescription, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE))
+                .addComponent(scrollPaneProductDescription, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JTextArea productDescriptionArea;
     private javax.swing.JLabel productDescriptionLabel;
+    private javax.swing.JTextField productName;
     private org.jdesktop.swingx.JXTable productTable;
     private javax.swing.JScrollPane scrollPaneProductDescription;
     private javax.swing.JScrollPane scrollPaneProductTable;
     // End of variables declaration//GEN-END:variables
+
     @Override
     public void componentOpened() {
         // We add this TopComponent as a LookupListener every time this TC is opened. See componentClosed().
         categoryResult = Utilities.actionsGlobalContext().lookupResult(ICategory.class);
-        categoryResult.addLookupListener (this);
+        categoryResult.addLookupListener(this);
     }
 
     @Override
@@ -137,8 +181,8 @@ public final class ProductEditorTopComponent extends TopComponent implements Loo
 
     @Override
     public void resultChanged(LookupEvent ev) {
-        Collection<? extends ICategory> catRes =  categoryResult.allInstances();
-        if( catRes.size() == 1)  {
+        Collection<? extends ICategory> catRes = categoryResult.allInstances();
+        if (catRes.size() == 1) {
             ICategory category = catRes.iterator().next();
             if (category == null) {
                 return;
@@ -146,16 +190,78 @@ public final class ProductEditorTopComponent extends TopComponent implements Loo
             productDescriptionArea.setText(""); // Clear the text area when we select something else. it just looks wierd otherwise.
             // TODO if the state of the description is dirty we should ask what to do before we do anything.
             try {
-            productEventList.getReadWriteLock().writeLock().lock();
-            productEventList.clear();
-            productEventList.addAll( productDAO.getProducts(category) );
+                productEventList.getReadWriteLock().writeLock().lock();
+                productEventList.clear();
+                productEventList.addAll(productDAO.getProducts(category));
             } finally {
                 productEventList.getReadWriteLock().writeLock().unlock();
             }
         }
-        
-    }    
-    
+
+    }
+
+    private void modify() {
+        if (getLookup().lookup(MySavable.class) == null) {
+            ic.add(new MySavable());
+        }
+    }
+    private void removeModify() {
+        MySavable save = getLookup().lookup(MySavable.class);
+        if(save != null) {
+            save.handleNewProductInsert();
+            System.out.println("save.handleNewProductInsert() != null");
+        } else {
+            System.out.println("save.handleNewProductInsert() == NULL!!!!!!!!!!!");
+        }
+    }
+
+    /**
+     * @see <a href="https://blogs.oracle.com/geertjan/entry/bye_savecookie_hello_org_netbeans">Geertjan Wielengas Blog</a>
+     */
+    private class MySavable extends AbstractSavable {
+
+        public MySavable() {
+            register();
+        }
+
+        @Override
+        protected String findDisplayName() {
+            return productName.getText();
+        }
+
+        @Override
+        protected void handleSave() throws IOException {
+            tc().ic.remove(this);
+            unregister();
+            currentProduct.setName(productName.getText());
+            currentProduct.setDescription(productDescriptionArea.getText());
+            productDAO.save(currentProduct);
+        }
+
+        ProductEditorTopComponent tc() {
+            return ProductEditorTopComponent.this;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof MySavable) {
+                MySavable m = (MySavable) obj;
+                return tc() == m.tc();
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return tc().hashCode();
+        }
+        // This is our method to ensure that the save buttons are disabled when we display the name and description of a new product.
+        private void handleNewProductInsert() {
+            tc().ic.remove(this);
+            unregister();
+        }
+    }
+
     private class ProductRowSelectionListener implements ListSelectionListener {
 
         @Override
@@ -166,7 +272,13 @@ public final class ProductEditorTopComponent extends TopComponent implements Loo
             if (productTable.getSelectedRowCount() > 0) {
                 final int modelRowNum = productTable.convertRowIndexToModel(productTable.getSelectedRow());
                 final IProduct p = productsTableModel.getElementAt(modelRowNum);
+                productName.setText(p.getName());
                 productDescriptionArea.setText(p.getDescription());
+                currentProduct = p;
+                // We remove the previous product's "changes" so the SaveButton/SaveAllButton is reset to disabled when adding a new product.
+                removeModify(); // Seems like an ugly hack (if you figure out a better way please edit this)
+                manager.discardAllEdits(); // We discard all events prior to just after we set the name and description. (setText("") adds an Undo/Redo event.
+                
             }
         }
     }
