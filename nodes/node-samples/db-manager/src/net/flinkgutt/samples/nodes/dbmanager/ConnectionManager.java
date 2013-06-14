@@ -435,14 +435,19 @@ public class ConnectionManager extends javax.swing.JPanel {
             // TODO Implement setup of tunnel
             // some check to see if the tunnel is up and running
             // set clearToConnectToDB = false if the tunnel isn't open
+            clearToConnectToDB = false;
         }
-
+        // TODO Add some testing/validation of the parameters to the connection attempt.
         IDatabaseServer testServer = (IDatabaseServer) databaseServerComboBox.getSelectedItem();
-
         String dbUrl = testServer.getConnectionString() + hostnameField.getText() + ":" + dbPortField.getText() + "/" + databaseField.getText();
         String username = usernameField.getText();
         String password = new String(passwordField.getPassword());
 
+        // if the attempt to create a tunnel failed or some validation (TODO) fails on username, password, servername, port etc.
+        if(!clearToConnectToDB) {
+            return;
+        }
+        
         Connection connection = null;
         boolean success = true;
         String errorMessage = "";
@@ -463,6 +468,14 @@ public class ConnectionManager extends javax.swing.JPanel {
              */
             success = false;
             errorMessage = ex.getMessage();
+        } finally {
+            if (null != connection) {
+                try {
+                    connection.close();
+                } catch (SQLException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+            }
         }
 
         if (success) {
@@ -471,13 +484,6 @@ public class ConnectionManager extends javax.swing.JPanel {
         } else {
             NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.connect.failure", errorMessage), NotifyDescriptor.ERROR_MESSAGE);
             DialogDisplayer.getDefault().notifyLater(nd);
-        }
-        try {
-            if (connection != null) {
-                connection.close();
-            }
-        } catch (SQLException ex) {
-            Exceptions.printStackTrace(ex);
         }
     }//GEN-LAST:event_testConnectionButtonActionPerformed
     private int getIndexOfServer(IDatabaseServerSettings server) {

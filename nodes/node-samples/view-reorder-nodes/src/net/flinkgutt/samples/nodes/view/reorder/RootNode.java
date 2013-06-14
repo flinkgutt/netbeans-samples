@@ -17,18 +17,13 @@ import org.openide.util.lookup.InstanceContent;
  */
 public class RootNode extends AbstractNode {
 
-    // TODO Look into if we really need to save this
-    private ICategory category;
-
     public RootNode(final ICategory category, InstanceContent ic) {
         super(Children.create(new CategoryChildFactory(category), true), new AbstractLookup(ic));
-        this.category = category;
 
         ic.add(new Index.Support() {
             @Override
             public Node[] getNodes() {
-                Node[] nodes = getChildren().getNodes(true);
-                return nodes;
+                return getChildren().getNodes(true);
             }
 
             @Override
