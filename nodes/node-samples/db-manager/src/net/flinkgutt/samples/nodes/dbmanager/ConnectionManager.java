@@ -36,8 +36,8 @@ public class ConnectionManager extends javax.swing.JPanel {
     private List<IDatabaseServer> databaseServers = new ArrayList<IDatabaseServer>();
     private EventList<IDatabaseServerSettings> settingsEventList = new BasicEventList<IDatabaseServerSettings>();
     private DefaultEventListModel<IDatabaseServerSettings> settingsModel = GlazedListsSwing.eventListModel(settingsEventList);
-    private static final Logger logger = Logger.getLogger(ConnectionManager.class.getName());
-    
+    private static final Logger LOG = Logger.getLogger(ConnectionManager.class.getName());
+
     /**
      * Creates new form ConnectionManager
      */
@@ -466,16 +466,18 @@ public class ConnectionManager extends javax.swing.JPanel {
         }
 
         if (success) {
-            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ConnectionManager.class,"ConnectionManager.connect.success"), NotifyDescriptor.INFORMATION_MESSAGE);
+            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.connect.success"), NotifyDescriptor.INFORMATION_MESSAGE);
             DialogDisplayer.getDefault().notifyLater(nd);
-            try {
-                connection.close();
-            } catch (SQLException ex) {
-                Exceptions.printStackTrace(ex);
-            }
         } else {
-            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ConnectionManager.class,"ConnectionManager.connect.failure",errorMessage), NotifyDescriptor.ERROR_MESSAGE);
+            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.connect.failure", errorMessage), NotifyDescriptor.ERROR_MESSAGE);
             DialogDisplayer.getDefault().notifyLater(nd);
+        }
+        try {
+            if (connection != null) {
+                connection.close();
+            }
+        } catch (SQLException ex) {
+            Exceptions.printStackTrace(ex);
         }
     }//GEN-LAST:event_testConnectionButtonActionPerformed
     private int getIndexOfServer(IDatabaseServerSettings server) {
@@ -562,13 +564,13 @@ public class ConnectionManager extends javax.swing.JPanel {
                 isUp = service.connect(currentSettings);
             } catch (Exception e) { // This is bad, don't do this.
                 errorMessage = e.getMessage();
-                logger.log(Level.SEVERE,"Error during either connection to server or during DB creation.", e);
+                LOG.log(Level.SEVERE, "Error during either connection to server or during DB creation.", e);
             }
             NotifyDescriptor nd;
             if (isUp) {
-                nd = new NotifyDescriptor.Message(NbBundle.getMessage(ConnectionManager.class,"ConnectionManager.connect.success"), NotifyDescriptor.INFORMATION_MESSAGE);
+                nd = new NotifyDescriptor.Message(NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.connect.success"), NotifyDescriptor.INFORMATION_MESSAGE);
             } else {
-                nd = new NotifyDescriptor.Message(NbBundle.getMessage(ConnectionManager.class,"ConnectionManager.connect.failure",errorMessage), NotifyDescriptor.ERROR_MESSAGE);
+                nd = new NotifyDescriptor.Message(NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.connect.failure", errorMessage), NotifyDescriptor.ERROR_MESSAGE);
             }
             DialogDisplayer.getDefault().notify(nd);
         }
@@ -577,7 +579,7 @@ public class ConnectionManager extends javax.swing.JPanel {
     private void addServerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addServerButtonActionPerformed
         // Adds an empty server settings object to the ServerJList
         DBServerSettings newServer = new DBServerSettings();
-        newServer.setDisplayName(NbBundle.getMessage(ConnectionManager.class,"ConnectionManager.newServerDisplayName.text",newServerCounter++));
+        newServer.setDisplayName(NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.newServerDisplayName.text", newServerCounter++));
         newServer.setStorageID("DBSERVER-" + System.currentTimeMillis());
         newServer.setSSHPort(22); // Just so it's set to the default value that's the most common.
         settingsEventList.add(newServer);
@@ -614,7 +616,7 @@ public class ConnectionManager extends javax.swing.JPanel {
 
     // Removes the currently selected server from the list and the backing datastore
     private void removeServerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeServerButtonActionPerformed
-        NotifyDescriptor nd = new NotifyDescriptor.Confirmation(NbBundle.getMessage(ConnectionManager.class,"ConnectionManager.removeServer.confirmation.body",currentSettings.getDisplayName()) , NbBundle.getMessage(ConnectionManager.class,"ConnectionManager.removeServer.confirmation.title"),
+        NotifyDescriptor nd = new NotifyDescriptor.Confirmation(NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.removeServer.confirmation.body", currentSettings.getDisplayName()), NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.removeServer.confirmation.title"),
                 NotifyDescriptor.QUESTION_MESSAGE);
         DialogDisplayer.getDefault().notify(nd);
 

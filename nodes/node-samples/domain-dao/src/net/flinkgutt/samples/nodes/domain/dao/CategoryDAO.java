@@ -76,7 +76,7 @@ public class CategoryDAO extends SuperDAO implements ICategoryDAO<Category> {
     }
 
     @Override
-    public void update(Category category) {
+    public boolean update(Category category) {
         String updateCategoryQuery = "UPDATE categories "
                 + "SET category_name=:name, category_description=:description, parent_id=:parentId, sort_order=:sortOrder "
                 + "WHERE category_id=:categoryId";
@@ -86,8 +86,10 @@ public class CategoryDAO extends SuperDAO implements ICategoryDAO<Category> {
                 .addValue("categoryId", category.getCategoryID())
                 .addValue("sortOrder", category.getSortOrder());
         int rowsAffected = jdbcTemplate.update(updateCategoryQuery, params);
-
-        // TODO Look into if this function should return a boolean
+        if(rowsAffected > 0) {
+            return true;
+        }
+        return false;
     }
 
     @Override

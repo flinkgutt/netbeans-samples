@@ -110,7 +110,8 @@ public class CategoryNode extends AbstractNode implements PropertyChangeListener
             NotifyDescriptor.InputLine input = new NotifyDescriptor.InputLine(
                     NbBundle.getMessage(CategoryNode.class, "Action.renameCategory.name.label"),
                     NbBundle.getMessage(CategoryNode.class, "Action.renameCategory.title"));
-            input.setInputText(category.getName()); // Setting the inputfield to the current name
+            // Setting the inputfield to the current name
+            input.setInputText(category.getName()); 
             Object result = DialogDisplayer.getDefault().notify(input);
             if (result != NotifyDescriptor.OK_OPTION) {
                 return;

@@ -1,9 +1,7 @@
-
 package net.flinkgutt.samples.nodes.view.beantree;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javax.swing.ActionMap;
 import net.flinkgutt.samples.nodes.api.ICategoryDAO;
 import net.flinkgutt.samples.nodes.api.db.IConnectionService;
 import org.netbeans.api.settings.ConvertAsProperties;

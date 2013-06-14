@@ -19,7 +19,7 @@ public interface ICategoryDAO<T extends ICategory> {
     void deleteCategory(T category);
     boolean hasChildren(T category);
     
-    void update(T category);
+    boolean update(T category);
 
     boolean addCategory(T category);
 

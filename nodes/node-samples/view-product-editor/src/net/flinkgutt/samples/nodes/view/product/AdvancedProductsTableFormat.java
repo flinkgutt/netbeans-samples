@@ -3,7 +3,10 @@ package net.flinkgutt.samples.nodes.view.product;
 import ca.odell.glazedlists.gui.TableFormat;
 import net.flinkgutt.samples.nodes.api.IProduct;
 import org.openide.util.NbBundle.Messages;
-import static net.flinkgutt.samples.nodes.view.product.Bundle.*; // This is so we can use the messages defined in @Messages() above getColumnName(int column) directly
+// We import Bundle.* statically
+// This is so we can use the messages defined in @Messages() annotation defined
+// above getColumnName(int column) directly
+import static net.flinkgutt.samples.nodes.view.product.Bundle.*; 
 
 /**
  *

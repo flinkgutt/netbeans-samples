@@ -12,7 +12,6 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 import net.flinkgutt.samples.nodes.api.db.IConnectionService;
 import net.flinkgutt.samples.nodes.api.db.IDatabaseServerSettings;
 import org.openide.util.Exceptions;
@@ -28,16 +27,16 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 // TODO Clean up the code
 public abstract class SuperDAO implements IConnectionService {
 
-    static NamedParameterJdbcTemplate jdbcTemplate;
+    protected static NamedParameterJdbcTemplate jdbcTemplate;
     private DriverManagerDataSource dataSource;
-    boolean isConnected = false;
+    protected boolean isConnected = false;
     public enum DBServer {
 
         MySQL, PostgreSQL
     }
-    public DBServer selected;
+    private DBServer selected;
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
-    Lookup.Result<IDatabaseServerSettings> settingsResult;
+    private Lookup.Result<IDatabaseServerSettings> settingsResult;
     
     public SuperDAO() {
     }

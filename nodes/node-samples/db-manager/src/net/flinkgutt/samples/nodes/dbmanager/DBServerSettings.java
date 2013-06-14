@@ -17,7 +17,8 @@ public class DBServerSettings implements IDatabaseServerSettings {
     private String driver, jdbcString;
     private int sshPort, dbPort;
     private boolean useTunnel;
-    private String storageID; // The identifier used for this server settings in whatever storage mechanism is used
+    // The identifier used for this server settings in whatever storage mechanism is used
+    private String storageID; 
 
     @Override
     public boolean useTunnel() {

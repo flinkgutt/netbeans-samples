@@ -1,14 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.flinkgutt.samples.nodes.view.reorder;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import net.flinkgutt.samples.nodes.api.ICategory;
 import net.flinkgutt.samples.nodes.api.ICategoryDAO;
-
 import net.flinkgutt.samples.nodes.api.db.IConnectionService;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
@@ -17,11 +12,8 @@ import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.ExplorerUtils;
 import org.openide.nodes.Node;
 import org.openide.util.Lookup;
-import org.openide.util.LookupEvent;
-import org.openide.util.LookupListener;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
-import org.openide.util.Utilities;
 import org.openide.util.WeakListeners;
 import org.openide.util.lookup.InstanceContent;
 
@@ -120,18 +112,16 @@ public final class ReOrderTopComponent extends TopComponent implements ExplorerM
     private javax.swing.JButton refreshButton;
     // End of variables declaration//GEN-END:variables
 
-    
-    
     @Override
     public void componentOpened() {
-        connection.addPropertyChangeListener("connection", WeakListeners.propertyChange(this,connection));
-        
+        connection.addPropertyChangeListener("connection", WeakListeners.propertyChange(this, connection));
+
         // check if we allready are connected
-        if( connection.isConnected() ) {
+        if (connection.isConnected()) {
             System.out.println("isConnected!");
             refreshTree();
         }
-        
+
     }
 
     @Override
@@ -159,10 +149,8 @@ public final class ReOrderTopComponent extends TopComponent implements ExplorerM
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         // We only listen to "connection" for now, but just to be on the defensive.
-        if (evt.getPropertyName().equalsIgnoreCase("connection")) {
-            if (evt.getNewValue().equals("connected")) {
-                refreshTree();
-            }
+        if ("connection".equals(evt.getPropertyName()) && "connected".equals(evt.getNewValue())) {
+            refreshTree();
         }
     }
 }

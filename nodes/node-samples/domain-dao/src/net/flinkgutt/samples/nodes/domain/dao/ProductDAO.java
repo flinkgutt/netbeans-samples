@@ -2,7 +2,6 @@ package net.flinkgutt.samples.nodes.domain.dao;
 
 import java.util.ArrayList;
 import java.util.List;
-import net.flinkgutt.samples.nodes.api.IProduct;
 import net.flinkgutt.samples.nodes.api.IProductDAO;
 import net.flinkgutt.samples.nodes.domain.entities.Category;
 import net.flinkgutt.samples.nodes.domain.entities.Product;

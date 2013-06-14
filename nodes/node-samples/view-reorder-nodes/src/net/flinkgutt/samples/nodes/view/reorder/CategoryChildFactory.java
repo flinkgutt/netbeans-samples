@@ -38,9 +38,9 @@ class CategoryChildFactory extends ChildFactory<ICategory> implements PropertyCh
         if (toPopulate.isEmpty()) {
             List<ICategory> categories = categoryDAO.getCategoriesWithParent(currentCategory);
             toPopulate.addAll(categories);
-        } else {
-            // We don't need to do anything because the list is allready populated, see propertyChange
-        }
+        } 
+        // If toPopulate is _NOT_ empty we don't need to do anything because the list is allready populated, see propertyChange below.
+        
         return true;
     }
 
