@@ -22,7 +22,7 @@ public class ProductDAO extends SuperDAO implements IProductDAO<Product, Categor
         }
         String getProductsInCategoryQuery = "SELECT p.* FROM products p LEFT JOIN products_to_categories cp ON p.product_id=cp.product_id_fk WHERE cp.category_id_fk=:categoryId";
         MapSqlParameterSource params = new MapSqlParameterSource("categoryId", category.getCategoryID());
-        return jdbcTemplate.query(getProductsInCategoryQuery, params, new ProductRowMapper());
+        return getJdbcTemplate().query(getProductsInCategoryQuery, params, new ProductRowMapper());
     }
 
     @Override
@@ -44,7 +44,7 @@ public class ProductDAO extends SuperDAO implements IProductDAO<Product, Categor
                 addValue("active", product.isActive()).
                 addValue("sortOrder",product.getSortOrder()).
                 addValue("productId", product.getProductID());
-        int rowsAffected = jdbcTemplate.update(updateProductQuery, params);
+        int rowsAffected = getJdbcTemplate().update(updateProductQuery, params);
         if(rowsAffected > 0) {
             return true;
         }
