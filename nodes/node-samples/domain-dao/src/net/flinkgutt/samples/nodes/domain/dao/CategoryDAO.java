@@ -58,7 +58,6 @@ public class CategoryDAO extends SuperDAO implements ICategoryDAO<Category> {
         String deleteCategoryQuery = "DELETE FROM categories WHERE category_id=:categoryId";
         MapSqlParameterSource params = new MapSqlParameterSource("categoryId", category.getCategoryID());
         int rowCount = getJdbcTemplate().update(deleteCategoryQuery, params);
-        System.out.println("deleteCategory->rowCount: " + rowCount);
         if (rowCount == 1) {
             category.getParent().removeChild(category);
         }

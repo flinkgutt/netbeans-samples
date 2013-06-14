@@ -58,7 +58,6 @@ public final class ReOrderTopComponent extends TopComponent implements ExplorerM
             return; // Or we could try one more time to find an implementation
         }
         ICategory rootCategory = categoryDAO.getRootCategory();
-        //Node rootNode = new RootNode(rootCategory, new InstanceContent());
         Node rootNode = new CategoryNode(rootCategory, new InstanceContent());
         em.setRootContext(rootNode);
         beanTreeView1.setRootVisible(false);
@@ -118,7 +117,6 @@ public final class ReOrderTopComponent extends TopComponent implements ExplorerM
 
         // check if we allready are connected
         if (connection.isConnected()) {
-            System.out.println("isConnected!");
             refreshTree();
         }
 

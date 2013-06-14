@@ -208,10 +208,7 @@ public final class ProductEditorTopComponent extends TopComponent implements Loo
     private void removeModify() {
         MySavable save = getLookup().lookup(MySavable.class);
         if(save != null) {
-            save.handleNewProductInsert();
-            System.out.println("save.handleNewProductInsert() != null");
-        } else {
-            System.out.println("save.handleNewProductInsert() == NULL!!!!!!!!!!!");
+            save.handleNewProductInsert();   
         }
     }
 

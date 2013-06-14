@@ -133,7 +133,6 @@ public final class BeanTreeTopComponent extends TopComponent implements Explorer
 
     @Override
     public ExplorerManager getExplorerManager() {
-        System.out.println("GETEXPLORERMANAGER!!!!");
         return em;
     }
 

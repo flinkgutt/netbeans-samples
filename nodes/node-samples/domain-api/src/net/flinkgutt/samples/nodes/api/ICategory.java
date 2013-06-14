@@ -9,9 +9,6 @@ import java.util.List;
  * @author Christian
  */
 public interface ICategory {
-    final int CATEGORY_NAME_CHANGE = 1;
-    final int CATEGORY_CHILD_ADD = 2;
-    final int CATEGORY_CHILD_REMOVE = 3;
     
     Integer getCategoryID();
     Integer getParentID();
@@ -19,7 +16,6 @@ public interface ICategory {
     void setName(String name);
     
     ICategory getParent();
-    //void setParent(ICategory parent);
     
     List<ICategory> getChildren();
     void addChild(ICategory child);
