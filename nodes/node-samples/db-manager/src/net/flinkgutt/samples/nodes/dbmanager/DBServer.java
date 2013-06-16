@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.flinkgutt.samples.nodes.dbmanager;
 
 import net.flinkgutt.samples.nodes.api.db.IDatabaseServer;
