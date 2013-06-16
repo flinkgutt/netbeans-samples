@@ -4,9 +4,6 @@ import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.swing.DefaultEventListModel;
 import ca.odell.glazedlists.swing.GlazedListsSwing;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -17,6 +14,7 @@ import javax.swing.DefaultComboBoxModel;
 import net.flinkgutt.samples.nodes.api.db.IConnectionService;
 import net.flinkgutt.samples.nodes.api.db.IDatabaseServer;
 import net.flinkgutt.samples.nodes.api.db.IDatabaseServerSettings;
+import net.flinkgutt.samples.nodes.api.db.TestConnectReturnObject;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.Exceptions;
@@ -37,7 +35,7 @@ public class ConnectionManager extends javax.swing.JPanel {
     private EventList<IDatabaseServerSettings> settingsEventList = new BasicEventList<IDatabaseServerSettings>();
     private DefaultEventListModel<IDatabaseServerSettings> settingsModel = GlazedListsSwing.eventListModel(settingsEventList);
     private static final Logger LOG = Logger.getLogger(ConnectionManager.class.getName());
-
+    private IDatabaseServerSettings currentSettings;
     /**
      * Creates new form ConnectionManager
      */
@@ -99,6 +97,8 @@ public class ConnectionManager extends javax.swing.JPanel {
         sshUsernameField = new javax.swing.JTextField();
         sshPasswordLabel = new javax.swing.JLabel();
         sshPasswordField = new javax.swing.JPasswordField();
+        sshRemoteDBPortLabel = new javax.swing.JLabel();
+        sshRemoteDBPortSpinner = new javax.swing.JSpinner();
         connectButton = new javax.swing.JButton();
         addServerButton = new javax.swing.JButton();
         saveServerSettingButton = new javax.swing.JButton();
@@ -270,38 +270,44 @@ public class ConnectionManager extends javax.swing.JPanel {
         sshPasswordField.setText(org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.sshPasswordField.text")); // NOI18N
         sshPasswordField.setEnabled(false);
 
+        org.openide.awt.Mnemonics.setLocalizedText(sshRemoteDBPortLabel, org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.sshRemoteDBPortLabel.text")); // NOI18N
+        sshRemoteDBPortLabel.setEnabled(false);
+
+        sshRemoteDBPortSpinner.setModel(new javax.swing.SpinnerNumberModel(3306, 1, 65536, 1));
+        sshRemoteDBPortSpinner.setToolTipText(org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.sshRemoteDBPortSpinner.toolTipText")); // NOI18N
+        sshRemoteDBPortSpinner.setEnabled(false);
+
         javax.swing.GroupLayout sshTunnelPanelLayout = new javax.swing.GroupLayout(sshTunnelPanel);
         sshTunnelPanel.setLayout(sshTunnelPanelLayout);
         sshTunnelPanelLayout.setHorizontalGroup(
             sshTunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(sshTunnelPanelLayout.createSequentialGroup()
+                .addGap(10, 10, 10)
                 .addGroup(sshTunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sshTunnelPanelLayout.createSequentialGroup()
-                        .addGroup(sshTunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, sshTunnelPanelLayout.createSequentialGroup()
-                                .addGap(12, 12, 12)
-                                .addComponent(sshPasswordLabel))
+                    .addComponent(useSSHTunnelCheckbox)
+                    .addGroup(sshTunnelPanelLayout.createSequentialGroup()
+                        .addGroup(sshTunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(sshTunnelPanelLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(sshTunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(sshPortLabel)
-                                    .addComponent(sshHostIpLabel)
-                                    .addComponent(sshUsernameLabel))))
+                                .addGap(28, 28, 28)
+                                .addGroup(sshTunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(sshPasswordLabel, javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(sshUsernameLabel, javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(sshPortLabel, javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(sshHostIpLabel, javax.swing.GroupLayout.Alignment.TRAILING)))
+                            .addComponent(sshRemoteDBPortLabel))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(sshTunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(sshHostnameField)
-                            .addComponent(sshUsernameField)
-                            .addComponent(sshPasswordField, javax.swing.GroupLayout.DEFAULT_SIZE, 292, Short.MAX_VALUE)
-                            .addGroup(sshTunnelPanelLayout.createSequentialGroup()
-                                .addComponent(sshPortSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE))))
-                    .addGroup(sshTunnelPanelLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(sshTunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(useSSHTunnelCheckbox)
-                            .addComponent(sshTunnelExplainLabel))))
-                .addContainerGap())
+                            .addComponent(sshHostnameField, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(sshPortSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(sshUsernameField, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(sshPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(sshRemoteDBPortSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(sshTunnelExplainLabel))
+                .addContainerGap(44, Short.MAX_VALUE))
         );
+
+        sshTunnelPanelLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {sshPortSpinner, sshRemoteDBPortSpinner});
+
         sshTunnelPanelLayout.setVerticalGroup(
             sshTunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(sshTunnelPanelLayout.createSequentialGroup()
@@ -311,21 +317,25 @@ public class ConnectionManager extends javax.swing.JPanel {
                 .addComponent(sshTunnelExplainLabel)
                 .addGap(18, 18, 18)
                 .addGroup(sshTunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(sshHostnameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(sshHostIpLabel))
+                    .addComponent(sshHostIpLabel)
+                    .addComponent(sshHostnameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(sshTunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(sshTunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(sshPortLabel)
-                    .addComponent(sshPortSpinner, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(sshPortSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(sshTunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(sshUsernameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(sshUsernameLabel))
+                    .addComponent(sshUsernameLabel)
+                    .addComponent(sshUsernameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(sshTunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(sshPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(sshPasswordLabel))
-                .addContainerGap(100, Short.MAX_VALUE))
+                    .addComponent(sshPasswordLabel)
+                    .addComponent(sshPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(sshTunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(sshRemoteDBPortLabel)
+                    .addComponent(sshRemoteDBPortSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(74, Short.MAX_VALUE))
         );
 
         settingsTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.sshTunnelPanel.TabConstraints.tabTitle"), sshTunnelPanel); // NOI18N
@@ -424,65 +434,18 @@ public class ConnectionManager extends javax.swing.JPanel {
         sshUsernameLabel.setEnabled(isChecked);
         sshPasswordField.setEnabled(isChecked);
         sshPasswordLabel.setEnabled(isChecked);
+        sshRemoteDBPortSpinner.setEnabled(isChecked);
+        sshRemoteDBPortLabel.setEnabled(isChecked);
     }//GEN-LAST:event_useSSHTunnelCheckboxActionPerformed
 
     private void testConnectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testConnectionButtonActionPerformed
-        // TODO Check if everything we need is filled out properly
-
-        boolean clearToConnectToDB = true;
-        // If this connection is to use an SSH tunnel to get to the DB
-        if (useSSHTunnelCheckbox.isSelected()) {
-            // TODO Implement setup of tunnel
-            // some check to see if the tunnel is up and running
-            // set clearToConnectToDB = false if the tunnel isn't open
-            clearToConnectToDB = false;
-        }
-        // TODO Add some testing/validation of the parameters to the connection attempt.
-        IDatabaseServer testServer = (IDatabaseServer) databaseServerComboBox.getSelectedItem();
-        String dbUrl = testServer.getConnectionString() + hostnameField.getText() + ":" + dbPortField.getText() + "/" + databaseField.getText();
-        String username = usernameField.getText();
-        String password = new String(passwordField.getPassword());
-
-        // if the attempt to create a tunnel failed or some validation (TODO) fails on username, password, servername, port etc.
-        if(!clearToConnectToDB) {
-            return;
-        }
-        
-        Connection connection = null;
-        boolean success = true;
-        String errorMessage = "";
-        try {
-            Class.forName(testServer.getDriverUrl());
-            connection = DriverManager.getConnection(dbUrl,
-                    username, password);
-            connection.setAutoCommit(false);
-        } catch (SQLException ex) {
-            /*
-             ** "Connect error"...
-             */
-            success = false;
-            errorMessage = ex.getMessage();
-        } catch (java.lang.ClassNotFoundException ex) {
-            /*
-             ** "Driver error"...
-             */
-            success = false;
-            errorMessage = ex.getMessage();
-        } finally {
-            if (null != connection) {
-                try {
-                    connection.close();
-                } catch (SQLException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
-            }
-        }
-
-        if (success) {
+        TestConnectReturnObject testConnectResult = service.testConnect(currentSettings);
+        if (testConnectResult.isSuccessful()) {
             NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.connect.success"), NotifyDescriptor.INFORMATION_MESSAGE);
             DialogDisplayer.getDefault().notifyLater(nd);
         } else {
-            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.connect.failure", errorMessage), NotifyDescriptor.ERROR_MESSAGE);
+            
+            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.connect.failure", testConnectResult.getErrorMessage()), NotifyDescriptor.ERROR_MESSAGE);
             DialogDisplayer.getDefault().notifyLater(nd);
         }
     }//GEN-LAST:event_testConnectionButtonActionPerformed
@@ -550,15 +513,14 @@ public class ConnectionManager extends javax.swing.JPanel {
                 databaseServerComboBox.setSelectedIndex(i);
             }
         }
-
     }//GEN-LAST:event_serverJListValueChanged
 
     private void databaseServerComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_databaseServerComboBoxActionPerformed
         IDatabaseServer databaseServer = (IDatabaseServer) databaseServerComboBox.getSelectedItem();
         dbPortField.setText(databaseServer.getDefaultPort());
-
+        sshRemoteDBPortSpinner.setValue(Integer.valueOf(databaseServer.getDefaultPort()));
     }//GEN-LAST:event_databaseServerComboBoxActionPerformed
-    private IDatabaseServerSettings currentSettings = null;
+    
     private void connectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectButtonActionPerformed
         // TODO add your handling code here:
         saveServerSettingButtonActionPerformed(null);
@@ -610,6 +572,7 @@ public class ConnectionManager extends javax.swing.JPanel {
         ((DBServerSettings) currentSettings).setSSHUsername(sshUsernameField.getText());
         ((DBServerSettings) currentSettings).setUseTunnel(useSSHTunnelCheckbox.isSelected());
         ((DBServerSettings) currentSettings).setSSHPort((Integer) sshPortSpinner.getValue());
+        ((DBServerSettings) currentSettings).setRemoteDbPort((Integer) sshRemoteDBPortSpinner.getValue());
 
         // Database Server stuff (i.e. MySQL, PostgreSQL)
         IDatabaseServer server = (IDatabaseServer) databaseServerComboBox.getSelectedItem();
@@ -674,6 +637,8 @@ public class ConnectionManager extends javax.swing.JPanel {
     private javax.swing.JLabel sshPasswordLabel;
     private javax.swing.JLabel sshPortLabel;
     private javax.swing.JSpinner sshPortSpinner;
+    private javax.swing.JLabel sshRemoteDBPortLabel;
+    private javax.swing.JSpinner sshRemoteDBPortSpinner;
     private javax.swing.JLabel sshTunnelExplainLabel;
     private javax.swing.JPanel sshTunnelPanel;
     private javax.swing.JTextField sshUsernameField;
@@ -697,8 +662,15 @@ public class ConnectionManager extends javax.swing.JPanel {
         settings.put("dbpassword", s.getDBPassword());
         settings.put("dbname", s.getDBName());
         settings.putInt("dbport", s.getDBPort());
-        settings.putBoolean("useTunnel", s.useTunnel());
 
+        settings.putBoolean("useTunnel", s.useTunnel());
+        settings.put("sshHostname",s.getSSHHostname());
+        settings.put("sshUsername", s.getSSHUsername());
+        settings.put("sshPassword", s.getSSHPassword());
+        settings.putInt("sshPort",s.getSSHPort());
+        
+        settings.putInt("remoteDBPort",s.getRemoteDbPort());
+        
         settings.put("dbidentifier", s.getDBIdentifier());
         settings.put("jdbcurl", s.getJDBCString());
         settings.put("dbdriver", s.getDriver());
@@ -733,11 +705,13 @@ public class ConnectionManager extends javax.swing.JPanel {
                     se.setDriver(s.get("dbdriver", ""));
                     se.setJDBCString(s.get("jdbcurl", ""));
                     // SSH specific settings
-                    se.setUseTunnel(s.getBoolean("usetunnel", false));
-                    se.setSSHHostname(s.get("sshhostname", ""));
-                    se.setSSHUsername(s.get("sshusername", ""));
-                    se.setSSHPort(s.getInt("sshport", 22));
+                    se.setUseTunnel(s.getBoolean("useTunnel", false));
+                    se.setSSHHostname(s.get("sshHostname", ""));
+                    se.setSSHUsername(s.get("sshUsername", ""));
+                    se.setSSHPort(s.getInt("sshPort", 22));
 
+                    se.setRemoteDbPort(s.getInt("remoteDBPort", 0));
+                    
                     serverList.add(se);
                 }
             }

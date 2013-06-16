@@ -17,6 +17,7 @@ public interface IDatabaseServerSettings {
     String getDBPassword();
     String getDBName();
     int getDBPort();
+    int getRemoteDbPort();
     
     boolean useTunnel();
     String getSSHHostname();
@@ -31,4 +32,5 @@ public interface IDatabaseServerSettings {
      * @return the identifier this server setting is stored with
      */
     String getStoredID();
+
 }

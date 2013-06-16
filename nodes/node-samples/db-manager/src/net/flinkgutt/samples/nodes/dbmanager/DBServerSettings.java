@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.flinkgutt.samples.nodes.dbmanager;
 
 import net.flinkgutt.samples.nodes.api.db.IDatabaseServerSettings;
@@ -15,7 +11,7 @@ public class DBServerSettings implements IDatabaseServerSettings {
     private String displayName, dbHostname, dbUsername, dbPassword, dbName, dbIdentifier;
     private String sshHostname, sshUsername, sshPassword;
     private String driver, jdbcString;
-    private int sshPort, dbPort;
+    private int sshPort, dbPort, remoteDbPort;
     private boolean useTunnel;
     // The identifier used for this server settings in whatever storage mechanism is used
     private String storageID; 
@@ -158,6 +154,15 @@ public class DBServerSettings implements IDatabaseServerSettings {
     
     public void setStorageID(String storageIdentifier) {
         storageID = storageIdentifier;
+    }
+
+    @Override
+    public int getRemoteDbPort() {
+        return remoteDbPort;
+    }
+
+    public void setRemoteDbPort(int remoteDbPort) {
+        this.remoteDbPort = remoteDbPort;
     }
     
     

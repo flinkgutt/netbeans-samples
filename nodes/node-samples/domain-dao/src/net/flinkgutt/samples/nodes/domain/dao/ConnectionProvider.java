@@ -3,6 +3,8 @@ package net.flinkgutt.samples.nodes.domain.dao;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.flinkgutt.samples.nodes.api.db.IConnectionService;
 import net.flinkgutt.samples.nodes.api.db.IDatabaseServerSettings;
+import net.flinkgutt.samples.nodes.api.db.TestConnectReturnObject;
 import org.openide.util.Exceptions;
 import org.openide.util.lookup.ServiceProvider;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -22,6 +25,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
  */
 @ServiceProvider(service = IConnectionService.class)
 public class ConnectionProvider extends SuperDAO implements IConnectionService {
+
     public enum DBServer {
 
         MySQL, PostgreSQL
@@ -63,7 +67,62 @@ public class ConnectionProvider extends SuperDAO implements IConnectionService {
         return isUp;
     }
     
-     protected void checkForSampleDB() throws IOException {
+    
+    @Override
+    public TestConnectReturnObject testConnect(IDatabaseServerSettings testSettings) {
+        // TODO Check if everything we need is filled out properly
+        boolean clearToConnectToDB = true;
+        // If this connection is to use an SSH tunnel to get to the DB
+        if (testSettings.useTunnel()) {
+            // TODO Implement setup of tunnel
+            // some check to see if the tunnel is up and running
+            // set clearToConnectToDB = false if the tunnel isn't open
+            clearToConnectToDB = false;
+        }
+        // TODO Add some testing/validation of the parameters to the connection attempt.
+        String dbUrl = testSettings.getJDBCString() + testSettings.getDBHostname() + ":" + testSettings.getDBPort() + "/" + testSettings.getDBName();
+        String username = testSettings.getDBUsername();
+        String password = testSettings.getDBPassword();
+
+        // if the attempt to create a tunnel failed or some validation (TODO) fails on username, password, servername, port etc.
+        if(!clearToConnectToDB) {
+            return new TestConnectReturnObject(false,"Attempt to create SSH tunnel failed");
+        }
+        
+        Connection connection = null;
+        boolean success = true;
+        String errorMessage = "";
+        try {
+            Class.forName(testSettings.getDriver());
+            connection = DriverManager.getConnection(dbUrl,
+                    username, password);
+            connection.setAutoCommit(false);
+        } catch (SQLException ex) {
+            /*
+             ** "Connect error"...
+             */
+            success = false;
+            errorMessage = ex.getMessage();
+        } catch (java.lang.ClassNotFoundException ex) {
+            /*
+             ** "Driver error"...
+             */
+            success = false;
+            errorMessage = ex.getMessage();
+        } finally {
+            if (null != connection) {
+                try {
+                    connection.close();
+                } catch (SQLException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+            }
+        }
+        // TODO Close SSH Tunnel
+        return new TestConnectReturnObject(success,errorMessage);
+    }
+    
+    protected void checkForSampleDB() throws IOException {
         // Run SQL Create script based on what DB we have chosen to use
         switch (selected) {
             case MySQL:

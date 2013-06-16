@@ -17,4 +17,6 @@ public interface IConnectionService {
     void removePropertyChangelistener(String propertyName, PropertyChangeListener plc);
 
     boolean isConnected();
+
+    TestConnectReturnObject testConnect(IDatabaseServerSettings testSettings);
 }
