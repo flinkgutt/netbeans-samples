@@ -13,7 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.flinkgutt.samples.nodes.api.db.IConnectionService;
 import net.flinkgutt.samples.nodes.api.db.IDatabaseServerSettings;
-import net.flinkgutt.samples.nodes.api.db.TestConnectReturnObject;
+import net.flinkgutt.samples.nodes.api.db.ConnectionAttemptReturnObject;
 import org.openide.util.Exceptions;
 import org.openide.util.lookup.ServiceProvider;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -32,7 +32,7 @@ public class ConnectionProvider extends SuperDAO implements IConnectionService {
     }
     private DBServer selected;
     @Override
-    public boolean connect(IDatabaseServerSettings settings) {
+    public ConnectionAttemptReturnObject connect(IDatabaseServerSettings settings) {
         DriverManagerDataSource ds = new DriverManagerDataSource();
         ds.setDriverClassName(settings.getDriver());
         ds.setUrl(settings.getJDBCString() + settings.getDBHostname() + ":" + settings.getDBPort() + "/" + settings.getDBName());
@@ -50,6 +50,7 @@ public class ConnectionProvider extends SuperDAO implements IConnectionService {
             checkForSampleDB();
         } catch (IOException ex) {
             Logger.getLogger(SuperDAO.class.getName()).log(Level.SEVERE, null, ex);
+            return new ConnectionAttemptReturnObject(false, "Could not install sample data.\n"+ex.getMessage());
         }
         // Check to see if the connection is open, or rather in this case use the naive isClosed().
         // There are ways for a connection to not be formally closed but still "closed".
@@ -59,17 +60,17 @@ public class ConnectionProvider extends SuperDAO implements IConnectionService {
             ds.getConnection().isClosed();
         } catch (SQLException ex) {
             Exceptions.printStackTrace(ex);
-            return false;
+            return new ConnectionAttemptReturnObject(false, ex.getMessage());
         }
 
         firePropertyChange("connection", "disconnected", "connected");
         setConnected(isUp);
-        return isUp;
+        return new ConnectionAttemptReturnObject(isUp,"");
     }
     
     
     @Override
-    public TestConnectReturnObject testConnect(IDatabaseServerSettings testSettings) {
+    public ConnectionAttemptReturnObject testConnect(IDatabaseServerSettings testSettings) {
         // TODO Check if everything we need is filled out properly
         boolean clearToConnectToDB = true;
         // If this connection is to use an SSH tunnel to get to the DB
@@ -86,7 +87,7 @@ public class ConnectionProvider extends SuperDAO implements IConnectionService {
 
         // if the attempt to create a tunnel failed or some validation (TODO) fails on username, password, servername, port etc.
         if(!clearToConnectToDB) {
-            return new TestConnectReturnObject(false,"Attempt to create SSH tunnel failed");
+            return new ConnectionAttemptReturnObject(false,"Attempt to create SSH tunnel failed");
         }
         
         Connection connection = null;
@@ -119,7 +120,7 @@ public class ConnectionProvider extends SuperDAO implements IConnectionService {
             }
         }
         // TODO Close SSH Tunnel
-        return new TestConnectReturnObject(success,errorMessage);
+        return new ConnectionAttemptReturnObject(success,errorMessage);
     }
     
     protected void checkForSampleDB() throws IOException {

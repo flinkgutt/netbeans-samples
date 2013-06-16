@@ -14,7 +14,7 @@ import javax.swing.DefaultComboBoxModel;
 import net.flinkgutt.samples.nodes.api.db.IConnectionService;
 import net.flinkgutt.samples.nodes.api.db.IDatabaseServer;
 import net.flinkgutt.samples.nodes.api.db.IDatabaseServerSettings;
-import net.flinkgutt.samples.nodes.api.db.TestConnectReturnObject;
+import net.flinkgutt.samples.nodes.api.db.ConnectionAttemptReturnObject;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.Exceptions;
@@ -36,6 +36,7 @@ public class ConnectionManager extends javax.swing.JPanel {
     private DefaultEventListModel<IDatabaseServerSettings> settingsModel = GlazedListsSwing.eventListModel(settingsEventList);
     private static final Logger LOG = Logger.getLogger(ConnectionManager.class.getName());
     private IDatabaseServerSettings currentSettings;
+
     /**
      * Creates new form ConnectionManager
      */
@@ -439,12 +440,12 @@ public class ConnectionManager extends javax.swing.JPanel {
     }//GEN-LAST:event_useSSHTunnelCheckboxActionPerformed
 
     private void testConnectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testConnectionButtonActionPerformed
-        TestConnectReturnObject testConnectResult = service.testConnect(currentSettings);
+        ConnectionAttemptReturnObject testConnectResult = service.testConnect(currentSettings);
         if (testConnectResult.isSuccessful()) {
             NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.connect.success"), NotifyDescriptor.INFORMATION_MESSAGE);
             DialogDisplayer.getDefault().notifyLater(nd);
         } else {
-            
+
             NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.connect.failure", testConnectResult.getErrorMessage()), NotifyDescriptor.ERROR_MESSAGE);
             DialogDisplayer.getDefault().notifyLater(nd);
         }
@@ -520,22 +521,23 @@ public class ConnectionManager extends javax.swing.JPanel {
         dbPortField.setText(databaseServer.getDefaultPort());
         sshRemoteDBPortSpinner.setValue(Integer.valueOf(databaseServer.getDefaultPort()));
     }//GEN-LAST:event_databaseServerComboBoxActionPerformed
-    
+
     private void connectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectButtonActionPerformed
         // TODO add your handling code here:
         saveServerSettingButtonActionPerformed(null);
         currentSettings = serverJList.getSelectedValue();
         if (currentSettings != null) {
-            boolean isUp = false;
+
             String errorMessage = "";
+            ConnectionAttemptReturnObject conResult = null;
+            NotifyDescriptor nd;
             try {
-                isUp = service.connect(currentSettings);
+                conResult = service.connect(currentSettings);
             } catch (Exception e) { // This is bad, don't do this.
                 errorMessage = e.getMessage();
                 LOG.log(Level.SEVERE, "Error during either connection to server or during DB creation.", e);
             }
-            NotifyDescriptor nd;
-            if (isUp) {
+            if (conResult != null && conResult.isSuccessful()) {
                 nd = new NotifyDescriptor.Message(NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.connect.success"), NotifyDescriptor.INFORMATION_MESSAGE);
             } else {
                 nd = new NotifyDescriptor.Message(NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.connect.failure", errorMessage), NotifyDescriptor.ERROR_MESSAGE);
@@ -664,13 +666,13 @@ public class ConnectionManager extends javax.swing.JPanel {
         settings.putInt("dbport", s.getDBPort());
 
         settings.putBoolean("useTunnel", s.useTunnel());
-        settings.put("sshHostname",s.getSSHHostname());
+        settings.put("sshHostname", s.getSSHHostname());
         settings.put("sshUsername", s.getSSHUsername());
         settings.put("sshPassword", s.getSSHPassword());
-        settings.putInt("sshPort",s.getSSHPort());
-        
-        settings.putInt("remoteDBPort",s.getRemoteDbPort());
-        
+        settings.putInt("sshPort", s.getSSHPort());
+
+        settings.putInt("remoteDBPort", s.getRemoteDbPort());
+
         settings.put("dbidentifier", s.getDBIdentifier());
         settings.put("jdbcurl", s.getJDBCString());
         settings.put("dbdriver", s.getDriver());
@@ -711,7 +713,7 @@ public class ConnectionManager extends javax.swing.JPanel {
                     se.setSSHPort(s.getInt("sshPort", 22));
 
                     se.setRemoteDbPort(s.getInt("remoteDBPort", 0));
-                    
+
                     serverList.add(se);
                 }
             }

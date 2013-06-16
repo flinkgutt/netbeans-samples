@@ -8,7 +8,7 @@ import java.beans.PropertyChangeListener;
  * @author Christian
  */
 public interface IConnectionService {
-    boolean connect(IDatabaseServerSettings settings);
+    ConnectionAttemptReturnObject connect(IDatabaseServerSettings settings);
 
     void addPropertyChangeListener(PropertyChangeListener pcl);
     void addPropertyChangeListener(String propertyName, PropertyChangeListener pcl);
@@ -18,5 +18,5 @@ public interface IConnectionService {
 
     boolean isConnected();
 
-    TestConnectReturnObject testConnect(IDatabaseServerSettings testSettings);
+    ConnectionAttemptReturnObject testConnect(IDatabaseServerSettings testSettings);
 }
