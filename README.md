@@ -25,7 +25,7 @@ There is an Database Server Manager available in the application where you can d
 It's limited to MySQL and PostgreSQL for now.
 There is an option for tunneling, but it's not implemented quite yet.
 On connect it sets up the small sample table needed for the Nodes, it will do this every time you connect.
-
+It's recommended to use the username "netbeans-samples", if not you should probably take a look at mysql.sql and/or postgresql.sql
 
 ### NbPreferences
 The SQL Server settings are stored using NbPreferences, so it might be something to take a gander at. 

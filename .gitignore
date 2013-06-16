@@ -1,6 +1,7 @@
 *.class
 /nodes/node-samples/nbproject/private/
 rebel.xml
+.sonar/**
 /nodes/node-samples/build/
 /nodes/node-samples/domain-entities/build/
 /nodes/node-samples/domain-api/build/
