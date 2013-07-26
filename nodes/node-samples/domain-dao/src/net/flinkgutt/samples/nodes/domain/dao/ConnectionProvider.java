@@ -33,7 +33,7 @@ public class ConnectionProvider extends SuperDAO implements IConnectionService {
     private DBServer selected;
     @Override
     public ConnectionAttemptReturnObject connect(IDatabaseServerSettings settings) {
-        DriverManagerDataSource ds = new DriverManagerDataSource();
+        final DriverManagerDataSource ds = new DriverManagerDataSource();
         ds.setDriverClassName(settings.getDriver());
         ds.setUrl(settings.getJDBCString() + settings.getDBHostname() + ":" + settings.getDBPort() + "/" + settings.getDBName());
         ds.setUsername(settings.getDBUsername());
@@ -57,7 +57,7 @@ public class ConnectionProvider extends SuperDAO implements IConnectionService {
         // Check to see if the connection is open, or rather in this case use the naive isClosed().
         // There are ways for a connection to not be formally closed but still "closed".
         // So while this isn't perfect, it's ok for most situations.
-        boolean isUp = true;
+        final boolean isUp = true;
         try {
             ds.getConnection().isClosed();
         } catch (SQLException ex) {
@@ -82,15 +82,16 @@ public class ConnectionProvider extends SuperDAO implements IConnectionService {
             // set clearToConnectToDB = false if the tunnel isn't open
             clearToConnectToDB = false;
         }
-        // TODO Add some testing/validation of the parameters to the connection attempt.
-        String dbUrl = testSettings.getJDBCString() + testSettings.getDBHostname() + ":" + testSettings.getDBPort() + "/" + testSettings.getDBName();
-        String username = testSettings.getDBUsername();
-        String password = testSettings.getDBPassword();
 
         // if the attempt to create a tunnel failed or some validation (TODO) fails on username, password, servername, port etc.
         if(!clearToConnectToDB) {
             return new ConnectionAttemptReturnObject(false,"Attempt to create SSH tunnel failed");
         }
+        
+        // TODO Add some testing/validation of the parameters to the connection attempt.
+        final String dbUrl = testSettings.getJDBCString() + testSettings.getDBHostname() + ":" + testSettings.getDBPort() + "/" + testSettings.getDBName();
+        final String username = testSettings.getDBUsername();
+        final String password = testSettings.getDBPassword();
         
         Connection connection = null;
         boolean success = true;
