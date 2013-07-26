@@ -31,6 +31,7 @@ public class ConnectionProvider extends SuperDAO implements IConnectionService {
         MySQL, PostgreSQL, NONE
     }
     private DBServer selected;
+
     @Override
     public ConnectionAttemptReturnObject connect(IDatabaseServerSettings settings) {
         final DriverManagerDataSource ds = new DriverManagerDataSource();
@@ -44,15 +45,15 @@ public class ConnectionProvider extends SuperDAO implements IConnectionService {
         } else if (settings.getDBIdentifier().equalsIgnoreCase("org.postgresql")) {
             selected = DBServer.PostgreSQL;
         } else {
-             selected = DBServer.NONE;
+            selected = DBServer.NONE;
         }
 
-        setTemplate(  new NamedParameterJdbcTemplate(ds) );
+        setTemplate(new NamedParameterJdbcTemplate(ds));
         try {
             checkForSampleDB();
         } catch (IOException ex) {
             Logger.getLogger(SuperDAO.class.getName()).log(Level.SEVERE, null, ex);
-            return new ConnectionAttemptReturnObject(false, "Could not install sample data.\n"+ex.getMessage());
+            return new ConnectionAttemptReturnObject(false, "Could not install sample data.\n" + ex.getMessage());
         }
         // Check to see if the connection is open, or rather in this case use the naive isClosed().
         // There are ways for a connection to not be formally closed but still "closed".
@@ -63,13 +64,12 @@ public class ConnectionProvider extends SuperDAO implements IConnectionService {
             Exceptions.printStackTrace(ex);
             return new ConnectionAttemptReturnObject(false, ex.getMessage());
         }
-        
+
         firePropertyChange("connection", "disconnected", "connected");
         setConnected(true);
-        return new ConnectionAttemptReturnObject(true,"");
+        return new ConnectionAttemptReturnObject(true, "");
     }
-    
-    
+
     @Override
     public ConnectionAttemptReturnObject testConnect(IDatabaseServerSettings testSettings) {
         // TODO Check if everything we need is filled out properly
@@ -83,15 +83,15 @@ public class ConnectionProvider extends SuperDAO implements IConnectionService {
         }
 
         // if the attempt to create a tunnel failed or some validation (TODO) fails on username, password, servername, port etc.
-        if(!clearToConnectToDB) {
-            return new ConnectionAttemptReturnObject(false,"Attempt to create SSH tunnel failed");
+        if (!clearToConnectToDB) {
+            return new ConnectionAttemptReturnObject(false, "Attempt to create SSH tunnel failed");
         }
-        
+
         // TODO Add some testing/validation of the parameters to the connection attempt.
         final String dbUrl = testSettings.getJDBCString() + testSettings.getDBHostname() + ":" + testSettings.getDBPort() + "/" + testSettings.getDBName();
         final String username = testSettings.getDBUsername();
         final String password = testSettings.getDBPassword();
-        
+
         Connection connection = null;
         boolean success = true;
         String errorMessage = "";
@@ -122,9 +122,9 @@ public class ConnectionProvider extends SuperDAO implements IConnectionService {
             }
         }
         // TODO Close SSH Tunnel
-        return new ConnectionAttemptReturnObject(success,errorMessage);
+        return new ConnectionAttemptReturnObject(success, errorMessage);
     }
-    
+
     protected void checkForSampleDB() throws IOException {
         // Run SQL Create script based on what DB we have chosen to use
         switch (selected) {
@@ -135,6 +135,8 @@ public class ConnectionProvider extends SuperDAO implements IConnectionService {
             case PostgreSQL:
                 // Load postgresql.sql
                 getJdbcTemplate().getJdbcOperations().batchUpdate(removeEmptyLines("postgresql.sql"));
+                break;
+            default:
                 break;
         }
     }
@@ -154,5 +156,4 @@ public class ConnectionProvider extends SuperDAO implements IConnectionService {
         }
         return arr.toArray(new String[arr.size()]);
     }
-    
 }
