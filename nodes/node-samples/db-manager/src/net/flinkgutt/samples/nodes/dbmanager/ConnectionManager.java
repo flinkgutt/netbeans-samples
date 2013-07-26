@@ -440,9 +440,11 @@ public class ConnectionManager extends javax.swing.JPanel {
     }//GEN-LAST:event_useSSHTunnelCheckboxActionPerformed
 
     private void testConnectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testConnectionButtonActionPerformed
+        // Need to update currentSettings, so we just store the current settings from the panel to the datastore
+        saveServerSettingButtonActionPerformed(null); 
         ConnectionAttemptReturnObject testConnectResult = service.testConnect(currentSettings);
         if (testConnectResult.isSuccessful()) {
-            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.connect.success"), NotifyDescriptor.INFORMATION_MESSAGE);
+            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.connect.test.success"), NotifyDescriptor.INFORMATION_MESSAGE);
             DialogDisplayer.getDefault().notifyLater(nd);
         } else {
 
