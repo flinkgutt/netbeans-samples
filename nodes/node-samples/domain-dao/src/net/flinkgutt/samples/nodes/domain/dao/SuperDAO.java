@@ -16,7 +16,7 @@ public abstract class SuperDAO {
    
     private static boolean isConnected = false;
 
-    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     
     public SuperDAO() {
     }

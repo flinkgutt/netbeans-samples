@@ -146,8 +146,7 @@ public class ConnectionProvider extends SuperDAO implements IConnectionService {
         // jdbctemplate.batchUpdate() does _NOT_ like empty sql queries, so we need to remove every empty line we can find.
         // Yes, this is ugly. I know.
         List<String> arr = new ArrayList<String>();
-        for (int i = 0; i < tmp.length; i++) {
-            String string = tmp[i];
+        for (String string : tmp) {
             if (!string.trim().isEmpty()) {
                 arr.add(string);
             }

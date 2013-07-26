@@ -20,7 +20,7 @@ public class Category implements ICategory {
     private Integer categoryID;
     private String name, description;
     private List<ICategory> children = new ArrayList<ICategory>();
-    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private ICategory parent;
     private int sortOrder = 0;
 

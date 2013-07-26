@@ -29,7 +29,7 @@ public class CategoryDAO extends SuperDAO implements ICategoryDAO<Category> {
         String getCategoriesWithParentQuery = "SELECT category_id, category_name, category_description, active, sort_order FROM categories WHERE parent_id=:parentId ORDER BY sort_order ASC, category_name ASC";
         MapSqlParameterSource params = new MapSqlParameterSource("parentId", parent.getCategoryID());
         List<Category> children = getJdbcTemplate().query(getCategoriesWithParentQuery, params, new CategoryRowMapper(parent));
-        List<ICategory> c = Arrays.asList(children.toArray(new ICategory[0]));
+        List<ICategory> c = Arrays.asList(children.toArray(new ICategory[children.size()]));
         parent.setChildren(c);
         return children;
     }
@@ -68,10 +68,7 @@ public class CategoryDAO extends SuperDAO implements ICategoryDAO<Category> {
         String hasChildrenQuery = "SELECT COUNT(category_id) FROM categories WHERE parent_id=:parentId";
         MapSqlParameterSource params = new MapSqlParameterSource("parentId", category.getCategoryID());
         Integer rowCount = getJdbcTemplate().queryForObject(hasChildrenQuery, params, Integer.class);
-        if (rowCount > 0) {
-            return true;
-        }
-        return false;
+        return rowCount > 0;
     }
 
     @Override
@@ -85,10 +82,7 @@ public class CategoryDAO extends SuperDAO implements ICategoryDAO<Category> {
                 .addValue("categoryId", category.getCategoryID())
                 .addValue("sortOrder", category.getSortOrder());
         int rowsAffected = getJdbcTemplate().update(updateCategoryQuery, params);
-        if(rowsAffected > 0) {
-            return true;
-        }
-        return false;
+        return rowsAffected > 0;
     }
 
     @Override

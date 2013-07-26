@@ -65,10 +65,12 @@ public class Product implements IProduct {
         this.sortOrder = sortOrder;
     }
 
+    @Override
     public BigDecimal getPrice() {
         return price;
     }
 
+    @Override
     public void setPrice(BigDecimal price) {
         this.price = price;
     }

@@ -45,9 +45,6 @@ public class ProductDAO extends SuperDAO implements IProductDAO<Product, Categor
                 addValue("sortOrder",product.getSortOrder()).
                 addValue("productId", product.getProductID());
         int rowsAffected = getJdbcTemplate().update(updateProductQuery, params);
-        if(rowsAffected > 0) {
-            return true;
-        }
-        return false;
+        return rowsAffected > 0;
     }
 }
