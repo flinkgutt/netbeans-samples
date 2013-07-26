@@ -26,10 +26,10 @@ public class CategoryDAO extends SuperDAO implements ICategoryDAO<Category> {
 
     @Override
     public List<Category> getCategoriesWithParent(Category parent) {
-        String getCategoriesWithParentQuery = "SELECT category_id, category_name, category_description, active, sort_order FROM categories WHERE parent_id=:parentId ORDER BY sort_order ASC, category_name ASC";
-        MapSqlParameterSource params = new MapSqlParameterSource("parentId", parent.getCategoryID());
-        List<Category> children = getJdbcTemplate().query(getCategoriesWithParentQuery, params, new CategoryRowMapper(parent));
-        List<ICategory> c = Arrays.asList(children.toArray(new ICategory[children.size()]));
+        final String getCategoriesWithParentQuery = "SELECT category_id, category_name, category_description, active, sort_order FROM categories WHERE parent_id=:parentId ORDER BY sort_order ASC, category_name ASC";
+        final MapSqlParameterSource params = new MapSqlParameterSource("parentId", parent.getCategoryID());
+        final List<Category> children = getJdbcTemplate().query(getCategoriesWithParentQuery, params, new CategoryRowMapper(parent));
+        final List<ICategory> c = Arrays.asList(children.toArray(new ICategory[children.size()]));
         parent.setChildren(c);
         return children;
     }
@@ -55,8 +55,8 @@ public class CategoryDAO extends SuperDAO implements ICategoryDAO<Category> {
             // TODO Look into if deleteCategory should return a boolean or some some other more rich object
             return;
         }
-        String deleteCategoryQuery = "DELETE FROM categories WHERE category_id=:categoryId";
-        MapSqlParameterSource params = new MapSqlParameterSource("categoryId", category.getCategoryID());
+        final String deleteCategoryQuery = "DELETE FROM categories WHERE category_id=:categoryId";
+        final MapSqlParameterSource params = new MapSqlParameterSource("categoryId", category.getCategoryID());
         int rowCount = getJdbcTemplate().update(deleteCategoryQuery, params);
         if (rowCount == 1) {
             category.getParent().removeChild(category);
@@ -65,34 +65,34 @@ public class CategoryDAO extends SuperDAO implements ICategoryDAO<Category> {
 
     @Override
     public boolean hasChildren(Category category) {
-        String hasChildrenQuery = "SELECT COUNT(category_id) FROM categories WHERE parent_id=:parentId";
-        MapSqlParameterSource params = new MapSqlParameterSource("parentId", category.getCategoryID());
-        Integer rowCount = getJdbcTemplate().queryForObject(hasChildrenQuery, params, Integer.class);
+        final String hasChildrenQuery = "SELECT COUNT(category_id) FROM categories WHERE parent_id=:parentId";
+        final MapSqlParameterSource params = new MapSqlParameterSource("parentId", category.getCategoryID());
+        final Integer rowCount = getJdbcTemplate().queryForObject(hasChildrenQuery, params, Integer.class);
         return rowCount > 0;
     }
 
     @Override
     public boolean update(Category category) {
-        String updateCategoryQuery = "UPDATE categories "
+        final String updateCategoryQuery = "UPDATE categories "
                 + "SET category_name=:name, category_description=:description, parent_id=:parentId, sort_order=:sortOrder "
                 + "WHERE category_id=:categoryId";
-        MapSqlParameterSource params = new MapSqlParameterSource("name", category.getName())
+        final MapSqlParameterSource params = new MapSqlParameterSource("name", category.getName())
                 .addValue("description", category.getDescription())
                 .addValue("parentId", category.getParentID())
                 .addValue("categoryId", category.getCategoryID())
                 .addValue("sortOrder", category.getSortOrder());
-        int rowsAffected = getJdbcTemplate().update(updateCategoryQuery, params);
+        final int rowsAffected = getJdbcTemplate().update(updateCategoryQuery, params);
         return rowsAffected > 0;
     }
 
     @Override
     public void updateChildrenSortOrder(Category parent) {
-        String updateSortOrderQuery = "UPDATE categories SET sort_order = :sortOrder WHERE category_id = :categoryId";
+        final String updateSortOrderQuery = "UPDATE categories SET sort_order = :sortOrder WHERE category_id = :categoryId";
         MapSqlParameterSource[] batchArgs = new MapSqlParameterSource[parent.getChildren().size()];
         
         for (int i = 0; i < parent.getChildren().size(); i++) {
-            ICategory category = parent.getChildren().get(i);
-            MapSqlParameterSource params = new MapSqlParameterSource("sortOrder", category.getSortOrder()).addValue("categoryId", category.getCategoryID());
+            final ICategory category = parent.getChildren().get(i);
+            final MapSqlParameterSource params = new MapSqlParameterSource("sortOrder", category.getSortOrder()).addValue("categoryId", category.getCategoryID());
             batchArgs[i] = params;
         }
 
@@ -101,13 +101,13 @@ public class CategoryDAO extends SuperDAO implements ICategoryDAO<Category> {
 
     @Override
     public boolean addCategory(Category category) {
-        String insertCategoryQuery = "INSERT INTO categories (category_name, category_description, parent_id, sort_order ) VALUES(:name, :description, :parentId, :sortOrder)";
-        MapSqlParameterSource params = new MapSqlParameterSource("name", category.getName())
+        final String insertCategoryQuery = "INSERT INTO categories (category_name, category_description, parent_id, sort_order ) VALUES(:name, :description, :parentId, :sortOrder)";
+        final MapSqlParameterSource params = new MapSqlParameterSource("name", category.getName())
                 .addValue("description", category.getDescription())
                 .addValue("parentId", category.getParentID())
                 .addValue("sortOrder", category.getSortOrder());
-        KeyHolder key = new GeneratedKeyHolder();
-        int rowsAffected = getJdbcTemplate().update(insertCategoryQuery, params, key);
+        final KeyHolder key = new GeneratedKeyHolder();
+        final int rowsAffected = getJdbcTemplate().update(insertCategoryQuery, params, key);
         if (rowsAffected != 1) {
             return false;
         }

@@ -34,6 +34,7 @@ public class ProductDAO extends SuperDAO implements IProductDAO<Product, Categor
         // If product does not exist, we should hand it over to another method to handle it's insert.
         if(product.getProductID() == 0) {
             // insertProduct-method
+            addProduct(product);
             return false;
         }
         String updateProductQuery = "UPDATE products SET product_name = :name, product_description = :description, product_price=:price, active=:active, sort_order=:sortOrder "
@@ -46,5 +47,9 @@ public class ProductDAO extends SuperDAO implements IProductDAO<Product, Categor
                 addValue("productId", product.getProductID());
         int rowsAffected = getJdbcTemplate().update(updateProductQuery, params);
         return rowsAffected > 0;
+    }
+
+    private void addProduct(Product product) {
+        throw new UnsupportedOperationException("Not supported yet."); 
     }
 }

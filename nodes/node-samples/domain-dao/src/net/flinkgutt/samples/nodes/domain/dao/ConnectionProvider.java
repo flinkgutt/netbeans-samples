@@ -57,17 +57,16 @@ public class ConnectionProvider extends SuperDAO implements IConnectionService {
         // Check to see if the connection is open, or rather in this case use the naive isClosed().
         // There are ways for a connection to not be formally closed but still "closed".
         // So while this isn't perfect, it's ok for most situations.
-        final boolean isUp = true;
         try {
             ds.getConnection().isClosed();
         } catch (SQLException ex) {
             Exceptions.printStackTrace(ex);
             return new ConnectionAttemptReturnObject(false, ex.getMessage());
         }
-
+        
         firePropertyChange("connection", "disconnected", "connected");
-        setConnected(isUp);
-        return new ConnectionAttemptReturnObject(isUp,"");
+        setConnected(true);
+        return new ConnectionAttemptReturnObject(true,"");
     }
     
     
@@ -140,16 +139,15 @@ public class ConnectionProvider extends SuperDAO implements IConnectionService {
         }
     }
 
-    private String[] removeEmptyLines(String file) throws FileNotFoundException {
-        String text;
-        InputStream is = getClass().getResourceAsStream(file);
-        text = new Scanner(is, "UTF-8").useDelimiter("\\A").next();
+    private String[] removeEmptyLines(final String file) throws FileNotFoundException {
+        final InputStream is = getClass().getResourceAsStream(file);
+        final String text = new Scanner(is, "UTF-8").useDelimiter("\\A").next();
 
-        String[] tmp = text.split(";");
+        final String[] tmp = text.split(";");
         // jdbctemplate.batchUpdate() does _NOT_ like empty sql queries, so we need to remove every empty line we can find.
         // Yes, this is ugly. I know.
-        List<String> arr = new ArrayList<String>();
-        for (String string : tmp) {
+        final List<String> arr = new ArrayList<String>();
+        for (final String string : tmp) {
             if (!string.trim().isEmpty()) {
                 arr.add(string);
             }
