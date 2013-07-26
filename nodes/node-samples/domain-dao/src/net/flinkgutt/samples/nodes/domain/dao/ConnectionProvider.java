@@ -28,7 +28,7 @@ public class ConnectionProvider extends SuperDAO implements IConnectionService {
 
     public enum DBServer {
 
-        MySQL, PostgreSQL
+        MySQL, PostgreSQL, NONE
     }
     private DBServer selected;
     @Override
@@ -43,6 +43,8 @@ public class ConnectionProvider extends SuperDAO implements IConnectionService {
             selected = DBServer.MySQL;
         } else if (settings.getDBIdentifier().equalsIgnoreCase("org.postgresql")) {
             selected = DBServer.PostgreSQL;
+        } else {
+             selected = DBServer.NONE;
         }
 
         setTemplate(  new NamedParameterJdbcTemplate(ds) );
