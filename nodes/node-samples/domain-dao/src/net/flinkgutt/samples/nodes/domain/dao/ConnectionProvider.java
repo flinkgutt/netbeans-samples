@@ -11,11 +11,13 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.sql.DataSource;
 import net.flinkgutt.samples.nodes.api.db.IConnectionService;
 import net.flinkgutt.samples.nodes.api.db.IDatabaseServerSettings;
 import net.flinkgutt.samples.nodes.api.db.ConnectionAttemptReturnObject;
 import org.openide.util.Exceptions;
 import org.openide.util.lookup.ServiceProvider;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
@@ -32,13 +34,26 @@ public class ConnectionProvider extends SuperDAO implements IConnectionService {
     }
     private DBServer selected;
 
+    private static AnnotationConfigApplicationContext ctx;
+    
+    public ConnectionProvider() {
+        if(ctx == null) {
+            ctx = new AnnotationConfigApplicationContext(DefaultApplicationConfiguration.class);
+        }
+    }
+    
     @Override
     public ConnectionAttemptReturnObject connect(IDatabaseServerSettings settings) {
-        final DriverManagerDataSource ds = new DriverManagerDataSource();
+        
+        RoutingDataSource.setDataSourceId(settings.getStoredID());
+        final DataSource ds = ctx.getBean("dataSource", DataSource.class);
+        
+        //ctx.getBean("dataSource", settings);
+        /*final DriverManagerDataSource ds = new DriverManagerDataSource();
         ds.setDriverClassName(settings.getDriver());
         ds.setUrl(settings.getJDBCString() + settings.getDBHostname() + ":" + settings.getDBPort() + "/" + settings.getDBName());
         ds.setUsername(settings.getDBUsername());
-        ds.setPassword(settings.getDBPassword());
+        ds.setPassword(settings.getDBPassword());*/
         // TODO Figure out a better way to do this thing
         if (settings.getDBIdentifier().equalsIgnoreCase("com.mysql")) {
             selected = DBServer.MySQL;

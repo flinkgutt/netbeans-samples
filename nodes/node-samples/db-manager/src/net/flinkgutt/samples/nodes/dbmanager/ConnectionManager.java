@@ -580,6 +580,7 @@ public class ConnectionManager extends javax.swing.JPanel {
 
         // Database Server stuff (i.e. MySQL, PostgreSQL)
         IDatabaseServer server = (IDatabaseServer) databaseServerComboBox.getSelectedItem();
+        System.out.println("Setting DriverURL: " + server.getDriverUrl());
         ((DBServerSettings) currentSettings).setDriver(server.getDriverUrl());
         ((DBServerSettings) currentSettings).setJDBCString(server.getConnectionString());
         ((DBServerSettings) currentSettings).setDBIdentifier(server.getIdentifier());
@@ -658,7 +659,7 @@ public class ConnectionManager extends javax.swing.JPanel {
         Preferences servers = NbPreferences.root().node(CONFIGURATION_NODE_NAME);
 
         String storedId = s.getStoredID();
-
+        System.out.println("Storing server: '"+storedId+"'");
         Preferences settings = servers.node(storedId);
         settings.put("displayname", s.getDisplayName());
         settings.put("dbhostname", s.getDBHostname());

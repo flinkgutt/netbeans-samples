@@ -24,6 +24,25 @@
                 </dependency>
             </module-dependencies>
             <public-packages>
+                <package>org.aopalliance.aop</package>
+                <package>org.aopalliance.intercept</package>
+                <package>org.objectweb.asm</package>
+                <package>org.objectweb.asm.signature</package>
+                <package>org.springframework.aop</package>
+                <package>org.springframework.aop.aspectj</package>
+                <package>org.springframework.aop.aspectj.annotation</package>
+                <package>org.springframework.aop.aspectj.autoproxy</package>
+                <package>org.springframework.aop.config</package>
+                <package>org.springframework.aop.framework</package>
+                <package>org.springframework.aop.framework.adapter</package>
+                <package>org.springframework.aop.framework.autoproxy</package>
+                <package>org.springframework.aop.framework.autoproxy.target</package>
+                <package>org.springframework.aop.interceptor</package>
+                <package>org.springframework.aop.scope</package>
+                <package>org.springframework.aop.support</package>
+                <package>org.springframework.aop.support.annotation</package>
+                <package>org.springframework.aop.target</package>
+                <package>org.springframework.aop.target.dynamic</package>
                 <package>org.springframework.asm</package>
                 <package>org.springframework.asm.commons</package>
                 <package>org.springframework.asm.signature</package>
@@ -42,6 +61,12 @@
                 <package>org.springframework.beans.factory.xml</package>
                 <package>org.springframework.beans.propertyeditors</package>
                 <package>org.springframework.beans.support</package>
+                <package>org.springframework.cache</package>
+                <package>org.springframework.cache.annotation</package>
+                <package>org.springframework.cache.concurrent</package>
+                <package>org.springframework.cache.config</package>
+                <package>org.springframework.cache.interceptor</package>
+                <package>org.springframework.cache.support</package>
                 <package>org.springframework.cglib</package>
                 <package>org.springframework.cglib.beans</package>
                 <package>org.springframework.cglib.core</package>
@@ -50,6 +75,15 @@
                 <package>org.springframework.cglib.transform</package>
                 <package>org.springframework.cglib.transform.impl</package>
                 <package>org.springframework.cglib.util</package>
+                <package>org.springframework.context</package>
+                <package>org.springframework.context.access</package>
+                <package>org.springframework.context.annotation</package>
+                <package>org.springframework.context.config</package>
+                <package>org.springframework.context.event</package>
+                <package>org.springframework.context.expression</package>
+                <package>org.springframework.context.i18n</package>
+                <package>org.springframework.context.support</package>
+                <package>org.springframework.context.weaving</package>
                 <package>org.springframework.core</package>
                 <package>org.springframework.core.annotation</package>
                 <package>org.springframework.core.convert</package>
@@ -70,6 +104,28 @@
                 <package>org.springframework.dao</package>
                 <package>org.springframework.dao.annotation</package>
                 <package>org.springframework.dao.support</package>
+                <package>org.springframework.ejb.access</package>
+                <package>org.springframework.ejb.config</package>
+                <package>org.springframework.ejb.interceptor</package>
+                <package>org.springframework.ejb.support</package>
+                <package>org.springframework.expression</package>
+                <package>org.springframework.expression.common</package>
+                <package>org.springframework.expression.spel</package>
+                <package>org.springframework.expression.spel.ast</package>
+                <package>org.springframework.expression.spel.standard</package>
+                <package>org.springframework.expression.spel.support</package>
+                <package>org.springframework.format</package>
+                <package>org.springframework.format.annotation</package>
+                <package>org.springframework.format.datetime</package>
+                <package>org.springframework.format.datetime.joda</package>
+                <package>org.springframework.format.number</package>
+                <package>org.springframework.format.support</package>
+                <package>org.springframework.instrument.classloading</package>
+                <package>org.springframework.instrument.classloading.glassfish</package>
+                <package>org.springframework.instrument.classloading.jboss</package>
+                <package>org.springframework.instrument.classloading.oc4j</package>
+                <package>org.springframework.instrument.classloading.weblogic</package>
+                <package>org.springframework.instrument.classloading.websphere</package>
                 <package>org.springframework.jca.cci</package>
                 <package>org.springframework.jca.cci.connection</package>
                 <package>org.springframework.jca.cci.core</package>
@@ -99,16 +155,56 @@
                 <package>org.springframework.jdbc.support.nativejdbc</package>
                 <package>org.springframework.jdbc.support.rowset</package>
                 <package>org.springframework.jdbc.support.xml</package>
+                <package>org.springframework.jmx</package>
+                <package>org.springframework.jmx.access</package>
+                <package>org.springframework.jmx.export</package>
+                <package>org.springframework.jmx.export.annotation</package>
+                <package>org.springframework.jmx.export.assembler</package>
+                <package>org.springframework.jmx.export.metadata</package>
+                <package>org.springframework.jmx.export.naming</package>
+                <package>org.springframework.jmx.export.notification</package>
+                <package>org.springframework.jmx.support</package>
+                <package>org.springframework.jndi</package>
+                <package>org.springframework.jndi.support</package>
+                <package>org.springframework.remoting</package>
+                <package>org.springframework.remoting.rmi</package>
+                <package>org.springframework.remoting.soap</package>
+                <package>org.springframework.remoting.support</package>
+                <package>org.springframework.scheduling</package>
+                <package>org.springframework.scheduling.annotation</package>
+                <package>org.springframework.scheduling.backportconcurrent</package>
+                <package>org.springframework.scheduling.concurrent</package>
+                <package>org.springframework.scheduling.config</package>
+                <package>org.springframework.scheduling.support</package>
+                <package>org.springframework.scheduling.timer</package>
+                <package>org.springframework.scripting</package>
+                <package>org.springframework.scripting.bsh</package>
+                <package>org.springframework.scripting.config</package>
+                <package>org.springframework.scripting.groovy</package>
+                <package>org.springframework.scripting.jruby</package>
+                <package>org.springframework.scripting.support</package>
+                <package>org.springframework.stereotype</package>
                 <package>org.springframework.transaction</package>
                 <package>org.springframework.transaction.annotation</package>
                 <package>org.springframework.transaction.config</package>
                 <package>org.springframework.transaction.interceptor</package>
                 <package>org.springframework.transaction.jta</package>
                 <package>org.springframework.transaction.support</package>
+                <package>org.springframework.ui</package>
+                <package>org.springframework.ui.context</package>
+                <package>org.springframework.ui.context.support</package>
                 <package>org.springframework.util</package>
                 <package>org.springframework.util.comparator</package>
                 <package>org.springframework.util.xml</package>
+                <package>org.springframework.validation</package>
+                <package>org.springframework.validation.annotation</package>
+                <package>org.springframework.validation.beanvalidation</package>
+                <package>org.springframework.validation.support</package>
             </public-packages>
+            <class-path-extension>
+                <runtime-relative-path>ext/aopalliance.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/aopalliance.jar</binary-origin>
+            </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/commons-logging-1.1.1.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/commons-logging-1.1.1.jar</binary-origin>
@@ -122,8 +218,24 @@
                 <binary-origin>release/modules/ext/spring-beans-3.2.3.RELEASE.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
+                <runtime-relative-path>ext/spring-context-3.2.3.RELEASE.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/spring-context-3.2.3.RELEASE.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
                 <runtime-relative-path>ext/spring-core-3.2.3.RELEASE.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/spring-core-3.2.3.RELEASE.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/asm-4.1.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/asm-4.1.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/spring-aop-3.2.3.RELEASE.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/spring-aop-3.2.3.RELEASE.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/spring-expression-3.2.3.RELEASE.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/spring-expression-3.2.3.RELEASE.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/spring-tx-3.2.3.RELEASE.jar</runtime-relative-path>
