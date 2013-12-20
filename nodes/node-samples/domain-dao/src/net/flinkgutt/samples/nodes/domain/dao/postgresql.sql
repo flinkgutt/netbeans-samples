@@ -34,7 +34,7 @@ FOREIGN KEY ("category_id_fk") REFERENCES categories ("category_id")
 ALTER TABLE "products_to_categories" OWNER TO "netbeans-samples";
 
 -- Insert some test data
-INSERT INTO categories (parent_id,category_name, category_description, active) VALUES(0, 'Books',null,true);
+INSERT INTO categories (parent_id,category_name, category_description, active) VALUES(0, 'BooksPostgreSQL',null,true);
 INSERT INTO categories (parent_id,category_name, category_description, active) VALUES(0, 'Movies',null,true);
 INSERT INTO categories (parent_id,category_name, category_description, active) VALUES(0, 'Posters',null,true);
 INSERT INTO categories (parent_id,category_name, category_description, active) VALUES(0, 'Online courses',null,true);

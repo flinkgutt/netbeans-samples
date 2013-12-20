@@ -43,7 +43,7 @@ ALTER TABLE `products_to_categories`
 
 
 -- Insert some test data
-INSERT INTO categories (parent_id,category_name, category_description, active) VALUES(0, 'Books',null,true);
+INSERT INTO categories (parent_id,category_name, category_description, active) VALUES(0, 'BooksMySQL',null,true);
 INSERT INTO categories (parent_id,category_name, category_description, active) VALUES(0, 'Movies',null,true);
 INSERT INTO categories (parent_id,category_name, category_description, active) VALUES(0, 'Posters',null,true);
 INSERT INTO categories (parent_id,category_name, category_description, active) VALUES(0, 'Online courses',null,true);
