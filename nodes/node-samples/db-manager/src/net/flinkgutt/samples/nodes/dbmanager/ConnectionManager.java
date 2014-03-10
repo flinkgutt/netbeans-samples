@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
 import javax.swing.DefaultComboBoxModel;
 import net.flinkgutt.samples.nodes.api.db.IConnectionService;
 import net.flinkgutt.samples.nodes.api.db.IDatabaseServer;
@@ -21,7 +20,6 @@ import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.openide.util.NbPreferences;
 
 /**
  *
@@ -29,28 +27,28 @@ import org.openide.util.NbPreferences;
  */
 public class ConnectionManager extends javax.swing.JPanel {
 
-    public static final String CONFIGURATION_NODE_NAME = "netbeans-samples_servers";
-    private IConnectionService service = Lookup.getDefault().lookup(IConnectionService.class);
-    private List<IDatabaseServer> databaseServers = new ArrayList<IDatabaseServer>();
-    private EventList<IDatabaseServerSettings> settingsEventList = new BasicEventList<IDatabaseServerSettings>();
-    private DefaultEventListModel<IDatabaseServerSettings> settingsModel = GlazedListsSwing.eventListModel(settingsEventList);
+    private final IConnectionService service = Lookup.getDefault().lookup(IConnectionService.class);
+    private final List<IDatabaseServer> databaseServers = new ArrayList<IDatabaseServer>();
+    private final EventList<IDatabaseServerSettings> settingsEventList = new BasicEventList<IDatabaseServerSettings>();
+    private final DefaultEventListModel<IDatabaseServerSettings> settingsModel = GlazedListsSwing.eventListModel(settingsEventList);
     private static final Logger LOG = Logger.getLogger(ConnectionManager.class.getName());
     private IDatabaseServerSettings currentSettings;
+    
 
     /**
      * Creates new form ConnectionManager
      */
     public ConnectionManager() {
         initComponents();
-
         // TODO This needs to be less hardcoded and coupled up with what's happening in SuperDAO and the registered SQL drivers.
         IDatabaseServer mysql = new DBServer("MySQL", "org.gjt.mm.mysql.Driver", "3306", "jdbc:mysql://", "com.mysql");
         IDatabaseServer postgresql = new DBServer("PostgreSQL", "org.postgresql.Driver", "5432", "jdbc:postgresql://", "org.postgresql");
         databaseServers.add(mysql);
         databaseServers.add(postgresql);
         databaseServerComboBox.setModel(new DefaultComboBoxModel<IDatabaseServer>(databaseServers.toArray(new IDatabaseServer[databaseServers.size()])));
+        settingsEventList.clear();
         try {
-            getConfiguredServers();
+            settingsEventList.addAll(ServerStoreService.getConfiguredServers());
         } catch (BackingStoreException ex) {
             Exceptions.printStackTrace(ex);
             // TODO Show some dialog to the user that tells them the PreferenceStore is unavailable, in different and prettier words
@@ -441,7 +439,7 @@ public class ConnectionManager extends javax.swing.JPanel {
 
     private void testConnectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testConnectionButtonActionPerformed
         // Need to update currentSettings, so we just store the current settings from the panel to the datastore
-        saveServerSettingButtonActionPerformed(null); 
+        saveServerSettingButtonActionPerformed(null);
         ConnectionAttemptReturnObject testConnectResult = service.testConnect(currentSettings);
         if (testConnectResult.isSuccessful()) {
             NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ConnectionManager.class, "ConnectionManager.connect.test.success"), NotifyDescriptor.INFORMATION_MESSAGE);
@@ -585,7 +583,7 @@ public class ConnectionManager extends javax.swing.JPanel {
         ((DBServerSettings) currentSettings).setJDBCString(server.getConnectionString());
         ((DBServerSettings) currentSettings).setDBIdentifier(server.getIdentifier());
 
-        storeServer(currentSettings);
+        ServerStoreService.storeServer(currentSettings);
     }//GEN-LAST:event_saveServerSettingButtonActionPerformed
 
     // Removes the currently selected server from the list and the backing datastore
@@ -601,14 +599,7 @@ public class ConnectionManager extends javax.swing.JPanel {
         }
         // We remove the server
         settingsEventList.remove(currentSettings);
-
-        Preferences configNode = NbPreferences.root().node(CONFIGURATION_NODE_NAME).node(currentSettings.getStoredID());
-        try {
-            configNode.removeNode();
-            configNode.flush();
-        } catch (BackingStoreException ex) {
-            Exceptions.printStackTrace(ex);
-        }
+        ServerStoreService.removeServer(currentSettings.getStoredID());
         // Clear the fields so we're ready to enter a new server
         clearFields();
 
@@ -654,78 +645,7 @@ public class ConnectionManager extends javax.swing.JPanel {
     private javax.swing.JLabel usernameLabel;
     // End of variables declaration//GEN-END:variables
 
-    private void storeServer(IDatabaseServerSettings s) {
-        // Just so we have something to test with for the time being
-        Preferences servers = NbPreferences.root().node(CONFIGURATION_NODE_NAME);
-
-        String storedId = s.getStoredID();
-        System.out.println("Storing server: '"+storedId+"'");
-        Preferences settings = servers.node(storedId);
-        settings.put("displayname", s.getDisplayName());
-        settings.put("dbhostname", s.getDBHostname());
-        settings.put("dbusername", s.getDBUsername());
-        settings.put("dbpassword", s.getDBPassword());
-        settings.put("dbname", s.getDBName());
-        settings.putInt("dbport", s.getDBPort());
-
-        settings.putBoolean("useTunnel", s.useTunnel());
-        settings.put("sshHostname", s.getSSHHostname());
-        settings.put("sshUsername", s.getSSHUsername());
-        settings.put("sshPassword", s.getSSHPassword());
-        settings.putInt("sshPort", s.getSSHPort());
-
-        settings.putInt("remoteDBPort", s.getRemoteDbPort());
-
-        settings.put("dbidentifier", s.getDBIdentifier());
-        settings.put("jdbcurl", s.getJDBCString());
-        settings.put("dbdriver", s.getDriver());
-        try {
-            servers.flush();
-        } catch (BackingStoreException ex) {
-            Exceptions.printStackTrace(ex);
-        }
-    }
-
-    private void getConfiguredServers() throws BackingStoreException {
-        List<IDatabaseServerSettings> serverList = new ArrayList<IDatabaseServerSettings>();
-
-        Preferences servers = NbPreferences.root().node(CONFIGURATION_NODE_NAME);
-        if (servers != null) {
-            String[] dbservers = servers.childrenNames();
-            for (int i = 0; i < dbservers.length; i++) {
-                String specificServer = dbservers[i];
-                if (specificServer.startsWith("DBSERVER-")) {
-                    Preferences s = servers.node(specificServer);
-                    DBServerSettings se = new DBServerSettings();
-                    // DB and Connection settings
-                    se.setDisplayName(s.get("displayname", ""));
-                    se.setDBHostname(s.get("dbhostname", ""));
-                    se.setDBPort(s.getInt("dbport", 0));
-                    se.setDbName(s.get("dbname", ""));
-                    se.setDbUsername(s.get("dbusername", ""));
-                    se.setDbPassword(s.get("dbpassword", ""));
-                    // DB and Storage settings 
-                    se.setStorageID(specificServer);
-                    se.setDBIdentifier(s.get("dbidentifier", ""));
-                    se.setDriver(s.get("dbdriver", ""));
-                    se.setJDBCString(s.get("jdbcurl", ""));
-                    // SSH specific settings
-                    se.setUseTunnel(s.getBoolean("useTunnel", false));
-                    se.setSSHHostname(s.get("sshHostname", ""));
-                    se.setSSHUsername(s.get("sshUsername", ""));
-                    se.setSSHPort(s.getInt("sshPort", 22));
-
-                    se.setRemoteDbPort(s.getInt("remoteDBPort", 0));
-
-                    serverList.add(se);
-                }
-            }
-        }
-        settingsEventList.clear();
-        settingsEventList.addAll(serverList);
-    }
     // Clear out the fields in the panels
-
     private void clearFields() {
         connectionNameField.setText("");
         databaseField.setText("");
