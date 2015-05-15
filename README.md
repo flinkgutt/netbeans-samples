@@ -5,6 +5,10 @@ Netbeans Platform samples
 Here you'll find fully working Netbeans Platform based application demos on how to accomplish different pretty standard application features.
 It's nowhere near complete or ready to be used as an example for most things, but it's a start for a discussion and hopefully some community participation. :-)
 
+## How to participate
+Filing a "bug" report is the easiest :-)
+I'm very open to any other contributions people may have.
+
 ## nodes/node-samples
 Shows a BeanTreeView backed by a SQL database through a loosely coupled DAO implementation. 
 The BeanTreeView shows a tree structure of Categories (nodes).
